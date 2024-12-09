@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.system.recourse.mapper.ParseRecourseMapper">
+    
+    <resultMap type="ParseRecourse" id="ParseRecourseResult">
+        <result property="resourceId"    column="resource_id"    />
+        <result property="resourceTitle"    column="resource_title"    />
+        <result property="resourceType"    column="resource_type"    />
+        <result property="matchMethod"    column="match_method"    />
+        <result property="parserType"    column="parser_type"    />
+        <result property="location"    column="location"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectParseRecourseVo">
+        select resource_id, resource_title, resource_type, match_method, parser_type, location, create_by, create_time, update_by, update_time, remark from parse_recourse
+    </sql>
+
+    <select id="selectParseRecourseList" parameterType="ParseRecourse" resultMap="ParseRecourseResult">
+        <include refid="selectParseRecourseVo"/>
+        <where>  
+            <if test="resourceTitle != null  and resourceTitle != ''"> and resource_title = #{resourceTitle}</if>
+        </where>
+    </select>
+    
+    <select id="selectParseRecourseByResourceId" parameterType="Long" resultMap="ParseRecourseResult">
+        <include refid="selectParseRecourseVo"/>
+        where resource_id = #{resourceId}
+    </select>
+
+    <insert id="insertParseRecourse" parameterType="ParseRecourse" useGeneratedKeys="true" keyProperty="resourceId">
+        insert into parse_recourse
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="resourceTitle != null and resourceTitle != ''">resource_title,</if>
+            <if test="resourceType != null">resource_type,</if>
+            <if test="matchMethod != null">match_method,</if>
+            <if test="parserType != null">parser_type,</if>
+            <if test="location != null and location != ''">location,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="resourceTitle != null and resourceTitle != ''">#{resourceTitle},</if>
+            <if test="resourceType != null">#{resourceType},</if>
+            <if test="matchMethod != null">#{matchMethod},</if>
+            <if test="parserType != null">#{parserType},</if>
+            <if test="location != null and location != ''">#{location},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateParseRecourse" parameterType="ParseRecourse">
+        update parse_recourse
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="resourceTitle != null and resourceTitle != ''">resource_title = #{resourceTitle},</if>
+            <if test="resourceType != null">resource_type = #{resourceType},</if>
+            <if test="matchMethod != null">match_method = #{matchMethod},</if>
+            <if test="parserType != null">parser_type = #{parserType},</if>
+            <if test="location != null and location != ''">location = #{location},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where resource_id = #{resourceId}
+    </update>
+
+    <delete id="deleteParseRecourseByResourceId" parameterType="Long">
+        delete from parse_recourse where resource_id = #{resourceId}
+    </delete>
+
+    <delete id="deleteParseRecourseByResourceIds" parameterType="String">
+        delete from parse_recourse where resource_id in 
+        <foreach item="resourceId" collection="array" open="(" separator="," close=")">
+            #{resourceId}
+        </foreach>
+    </delete>
+
+</mapper>

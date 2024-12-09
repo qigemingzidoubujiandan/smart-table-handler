@@ -3,6 +3,7 @@ package com.ruoyi.project.system.parse.parse.convert;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.text.CharSequenceUtil;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.project.system.parse.parse.util.TableUtil;
 
 import java.util.Arrays;
 import java.util.Comparator;

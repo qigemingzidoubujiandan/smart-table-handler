@@ -2,6 +2,7 @@ package com.ruoyi.project.system.parse.parse.parser;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
+import com.ruoyi.project.system.parse.parse.parser.model.Area;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;

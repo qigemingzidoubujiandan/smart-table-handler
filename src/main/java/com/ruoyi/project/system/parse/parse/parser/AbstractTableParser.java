@@ -3,12 +3,16 @@ package com.ruoyi.project.system.parse.parse.parser;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.text.CharSequenceUtil;
+import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.project.system.parse.parse.domain.Cell;
 import com.ruoyi.project.system.parse.parse.domain.Table;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
+
+import static com.ruoyi.project.system.parse.parse.convert.UnitExtractor.amountUnitExtract;
 
 public abstract class AbstractTableParser<T> implements IParser<T, List<? extends Table>> {
 

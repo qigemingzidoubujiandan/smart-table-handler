@@ -1,6 +1,7 @@
 package com.ruoyi.project.system.parse.parse.parser;
 
 import com.ruoyi.project.system.parse.parse.domain.PDFTable;
+import com.ruoyi.project.system.parse.parse.domain.PDFTableCell;
 import com.spire.pdf.PdfDocument;
 import com.spire.pdf.utilities.PdfTable;
 import com.spire.pdf.utilities.PdfTableExtractor;

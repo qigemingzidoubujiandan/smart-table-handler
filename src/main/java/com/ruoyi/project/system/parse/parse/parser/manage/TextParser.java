@@ -1,5 +1,8 @@
 package com.ruoyi.project.system.parse.parse.parser.manage;
 
+import com.ruoyi.project.system.parse.parse.extractor.TextExtractor;
+import com.ruoyi.project.system.parse.parse.parser.AbstractTextParser;
+import com.ruoyi.project.system.parse.parse.util.AssertUtil;
 import lombok.Getter;
 
 public class TextParser<T> {
