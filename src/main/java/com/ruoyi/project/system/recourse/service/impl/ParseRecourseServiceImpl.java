@@ -174,7 +174,8 @@ public class ParseRecourseServiceImpl implements IParseRecourseService {
      *
      * @param recourseId 资源主键
      */
-    public boolean parseTableConfigByRecourseId(Long recourseId) {
+    @Override
+    public boolean parseResource(Long recourseId) {
         ParseRecourse parseRecourse = parseRecourseMapper.selectParseRecourseByResourceId(recourseId);
         parse(parseRecourse);
         return true;
@@ -199,17 +200,17 @@ public class ParseRecourseServiceImpl implements IParseRecourseService {
         ParseRecourseFile parseRecourseFile = new ParseRecourseFile();
         parseRecourseFile.setResourceId(parseRecourse.getResourceId());
         List<ParseRecourseFile> parseRecourseFiles = parseRecourseFileMapper.selectParseRecourseFileList(parseRecourseFile);
-        // 遍历文件和子目录
-        parseRecourseFiles.forEach(this::doParse);
-    }
 
-    public void doParse(ParseRecourseFile parseRecourseFile) {
-        String filePath = parseRecourseFile.getLocation();
         // 根据文件资源 获取对应的解析配置
         ParseConfig parseConfigReq = new ParseConfig();
         parseConfigReq.setResourceId(parseConfigReq.getResourceId());
         List<ParseConfig> parseConfigList = parseConfigMapper.selectParseConfigList(parseConfigReq);
+        // 遍历文件和子目录
+        parseRecourseFiles.forEach(r -> doParse(r, parseConfigList));
+    }
 
+    public void doParse(ParseRecourseFile parseRecourseFile, List<ParseConfig> parseConfigList) {
+        String filePath = parseRecourseFile.getLocation();
         for (ParseConfig parseConfig : parseConfigList) {
             // 1.获取解析器->解析
             ParseTypeEnum parseTypeEnum = ParseTypeEnum.get(parseConfig.getConfigType().intValue());
@@ -230,14 +231,15 @@ public class ParseRecourseServiceImpl implements IParseRecourseService {
             String key = pair.getKey();
             IExtractor<?, ?> extractor = pair.getValue();
             Object result = ((IExtractor<Object, ?>) extractor).extract(parsed);
-            parseResult(parseRecourseFile, parseConfig.getParseDesc(), result);
+            parseResult(parseRecourseFile, parseConfig, result);
         }
-
     }
 
-    public void parseResult(ParseRecourseFile parseRecourseFile, String desc, Object parseResult) {
+    public void parseResult(ParseRecourseFile parseRecourseFile, ParseConfig parseConfig, Object parseResult) {
         System.out.println(parseRecourseFile);
-        System.out.println(desc);
+        System.out.println(parseConfig);
         System.out.println(parseResult);
+        // todo:
+
     }
 }

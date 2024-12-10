@@ -58,4 +58,13 @@ public interface IParseRecourseService {
      * @return 结果
      */
     public int deleteParseRecourseByResourceId(Long resourceId);
-}
+
+    /**
+     * 解析资源
+     *
+     * @param resourceId 需要解析资源主键
+     * @return 结果
+     */
+    public boolean parseResource(Long resourceId);
+
+    }

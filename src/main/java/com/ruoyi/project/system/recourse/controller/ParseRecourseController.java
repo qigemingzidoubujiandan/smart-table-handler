@@ -1,12 +1,6 @@
 package com.ruoyi.project.system.recourse.controller;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import com.ruoyi.common.utils.file.FileUploadUtils;
@@ -108,6 +102,15 @@ public class ParseRecourseController extends BaseController {
         return toAjax(parseRecourseService.insertParseRecourse(parseRecourse, upload));
     }
 
+    /**
+     * 解析资源
+     */
+    @Log(title = "资源", businessType = BusinessType.OTHER)
+    @PostMapping("/parse")
+    @ResponseBody
+    public AjaxResult parse(Long id) {
+        return toAjax(parseRecourseService.parseResource(id));
+    }
     /**
      * 修改资源
      */
