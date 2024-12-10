@@ -2,8 +2,6 @@ package com.ruoyi.project.system.recourse.service;
 
 import java.util.List;
 
-import com.ruoyi.project.system.recourse.domain.ParseRecourse;
-
 /**
  * 解析资源Service接口
  *

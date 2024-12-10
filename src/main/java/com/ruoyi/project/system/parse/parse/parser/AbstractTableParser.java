@@ -16,11 +16,6 @@ import static com.ruoyi.project.system.parse.parse.convert.UnitExtractor.amountU
 
 public abstract class AbstractTableParser<T> implements IParser<T, List<? extends Table>> {
 
-    /**
-     * 解析
-     */
-    @Override
-    public abstract List<? extends Table> parse(T t);
 
     /**
      * 处理扩展信息，先放这里吧

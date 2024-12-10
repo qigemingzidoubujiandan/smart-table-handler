@@ -23,8 +23,8 @@ public class HtmlTable implements Table {
     }
 
     @Override
-    public TableSourceEnum source() {
-        return TableSourceEnum.HTML;
+    public FileTypeEnum source() {
+        return FileTypeEnum.HTML;
     }
 
     @Override

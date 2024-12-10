@@ -3,7 +3,6 @@ package com.ruoyi.project.system.parse.mapper;
 import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.ruoyi.project.system.parse.domain.ParseTableConfig;
 
 /**
  * 表格配置Mapper接口

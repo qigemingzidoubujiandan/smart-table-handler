@@ -25,7 +25,7 @@ import static com.ruoyi.project.system.parse.parse.convert.UnitExtractor.amountU
 @SuppressWarnings("rawtypes")
 @Slf4j
 @Data
-public abstract class AbstractTableExtractor<T> implements TableParseRule<T> {
+public abstract class AbstractTableExtractor<T> implements IExtractor<List<Table>, T> {
 
     private T parsedResult;
 
@@ -47,17 +47,6 @@ public abstract class AbstractTableExtractor<T> implements TableParseRule<T> {
      * 解析后填充匹配的数据
      */
     abstract void fillMatchedData(T t);
-
-    /**
-     * 执行表格抽取解析
-     */
-    @Override
-    public T execute(List<? extends Table> tableList) {
-        doExecute(tableList);
-        return parsedResult;
-    }
-
-    abstract void doExecute(List<? extends Table> tableList);
 
     /**
      * kv表格单位转换

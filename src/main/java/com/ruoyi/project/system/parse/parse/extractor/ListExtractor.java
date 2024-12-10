@@ -6,7 +6,7 @@ import cn.hutool.core.util.StrUtil;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.project.system.parse.parse.domain.Cell;
 import com.ruoyi.project.system.parse.parse.domain.Table;
-import com.ruoyi.project.system.parse.parse.domain.TableSourceEnum;
+import com.ruoyi.project.system.parse.parse.domain.FileTypeEnum;
 import com.ruoyi.project.system.parse.parse.util.CollectionUtil;
 import com.ruoyi.project.system.parse.parse.util.TableUtil;
 import lombok.Data;
@@ -58,8 +58,14 @@ public class ListExtractor extends AbstractTableExtractor<List<List<String>>> {
         this.setIsMergeRow(isMergeRow);
     }
 
+
     @Override
-    void doExecute(List<? extends Table> unresolvedTables) {
+    public List<List<String>> extract(List<Table> tables) {
+        doExtract(tables);
+        return getParsedResult();
+    }
+
+    void doExtract(List<? extends Table> unresolvedTables) {
         this.unresolvedTables = unresolvedTables;
         if ("1".equals(isMergeRow)) {
             mergePDFRow(unresolvedTables);
@@ -80,6 +86,7 @@ public class ListExtractor extends AbstractTableExtractor<List<List<String>>> {
     public void fillMatchedData(List<List<String>> list) {
         getParsedResult().addAll(list);
     }
+
     /**
      * 模糊匹配抽取整个表格的内容信息
      * 表头模糊匹配
@@ -235,7 +242,7 @@ public class ListExtractor extends AbstractTableExtractor<List<List<String>>> {
         // 回调填充数据
         this.fillMatchedData(list);
         // pdf需要处理切割问题
-        if (!parsed() && Objects.equals(table.source(), TableSourceEnum.PDF)) {
+        if (!parsed() && Objects.equals(table.source(), FileTypeEnum.PDF)) {
             return ExtractRet.UNFINISHED;
         }
         return ExtractRet.FINISH;
@@ -278,7 +285,6 @@ public class ListExtractor extends AbstractTableExtractor<List<List<String>>> {
     }
 
 
-
     /**
      * 抽取完整的表格的内容信息
      * 如果是pdf抽取的，可能被分页割开，一直抽取到满足列数为止
@@ -312,7 +318,7 @@ public class ListExtractor extends AbstractTableExtractor<List<List<String>>> {
                 table.setExtracted(true);
             }
             // 如果表格类型是pdf,被分页切割了，需要继续进行抽取，重下一个、下下一个....表格进行抽取
-            while (Objects.equals(table.source(), TableSourceEnum.PDF) && i + 1 < unresolvedTables.size()
+            while (Objects.equals(table.source(), FileTypeEnum.PDF) && i + 1 < unresolvedTables.size()
                     && result == ExtractRet.UNFINISHED) {
                 Table nextPDFTable = unresolvedTables.get(++i);
                 if (fuzzyMatching) {
@@ -369,7 +375,7 @@ public class ListExtractor extends AbstractTableExtractor<List<List<String>>> {
                 table.setExtracted(true);
             }
             // 如果表格类型是pdf,被分页切割了，需要继续进行抽取，重下一个、下下一个....表格进行抽取
-            while (Objects.equals(table.source(), TableSourceEnum.PDF) && i + 1 < unresolvedTables.size()
+            while (Objects.equals(table.source(), FileTypeEnum.PDF) && i + 1 < unresolvedTables.size()
                     && result == ExtractRet.UNFINISHED) {
                 Table nextPDFTable = unresolvedTables.get(++i);
                 result = fuzzyMatchingAnyThExtractTableCell(nextPDFTable, thFunc, false);
@@ -389,6 +395,7 @@ public class ListExtractor extends AbstractTableExtractor<List<List<String>>> {
     private static Function<String, String> format() {
         return r -> r.replaceAll("\\s*|\r|\n|\t", "");
     }
+
 
     private static class ExtractRet {
 

@@ -1,10 +1,10 @@
 package com.ruoyi.project.system.parse.parse.demo.extractor;
 
 import com.ruoyi.project.system.parse.parse.anno.Reg;
-import com.ruoyi.project.system.parse.parse.extractor.TextExtractor;
+import com.ruoyi.project.system.parse.parse.extractor.AbstractTextExtractor;
 import lombok.Data;
 
-public class DemoTextExtractor extends TextExtractor<DemoTextExtractor.DemoExtractDTO> {
+public class DemoTextExtractor extends AbstractTextExtractor<DemoTextExtractor.DemoExtractDTO> {
 
     @Override
     public DemoExtractDTO extract(String text) {

@@ -40,7 +40,7 @@ public class WordTable implements Table {
     }
 
     @Override
-    public TableSourceEnum source() {
-        return TableSourceEnum.WORD;
+    public FileTypeEnum source() {
+        return FileTypeEnum.WORD;
     }
 }

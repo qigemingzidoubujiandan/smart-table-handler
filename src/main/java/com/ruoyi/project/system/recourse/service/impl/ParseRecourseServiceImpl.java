@@ -1,23 +1,25 @@
 package com.ruoyi.project.system.recourse.service.impl;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
-import cn.hutool.core.lang.Pair;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.DateUtils;
-import com.ruoyi.project.system.parse.domain.ParseTableConfig;
+import com.ruoyi.project.system.parse.domain.ParseConfig;
+import com.ruoyi.project.system.parse.domain.ParseRecourse;
+import com.ruoyi.project.system.parse.domain.ParseRecourseFile;
 import com.ruoyi.project.system.parse.mapper.ParseTableConfigMapper;
-import com.ruoyi.project.system.parse.parse.domain.PDFTable;
-import com.ruoyi.project.system.parse.parse.extractor.TableExtractorConvertor;
-import com.ruoyi.project.system.parse.parse.extractor.TableParseRule;
-import com.ruoyi.project.system.parse.parse.parser.SpirePDFTableParser;
+import com.ruoyi.project.system.parse.parse.domain.ParseTypeEnum;
+import com.ruoyi.project.system.parse.parse.domain.TableMatchMethodEnum;
+import com.ruoyi.project.system.parse.parse.extractor.ExtractorConvertor;
+import com.ruoyi.project.system.parse.parse.extractor.IExtractor;
+import com.ruoyi.project.system.parse.parse.parser.IParser;
+import com.ruoyi.project.system.parse.parse.parser.ParserFactory;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.project.system.recourse.mapper.ParseRecourseMapper;
-import com.ruoyi.project.system.recourse.domain.ParseRecourse;
 import com.ruoyi.project.system.recourse.service.IParseRecourseService;
 import com.ruoyi.common.utils.text.Convert;
 
@@ -111,18 +113,18 @@ public class ParseRecourseServiceImpl implements IParseRecourseService {
     @Override
     public boolean parseTableConfigByRecourseId(Long recourseId) {
         ParseRecourse parseRecourse = parseRecourseMapper.selectParseRecourseByResourceId(1L);
-        ParseTableConfig parseTableConfig = new ParseTableConfig();
+        ParseConfig parseTableConfig = new ParseConfig();
         parseTableConfig.setResourceId(1L);
-        List<ParseTableConfig> parseTableConfigs = parseTableConfigMapper.selectParseTableConfigList(parseTableConfig);
+        List<ParseConfig> parseTableConfigs = null;//parseTableConfigMapper.selectParseTableConfigList(parseTableConfig);
 
         parse(parseRecourse, parseTableConfigs);
         return true;
     }
 
 
-    public void parse(ParseRecourse parseRecourse, List<ParseTableConfig> tableConfigList) {
+    public void parse(ParseRecourse parseRecourse, List<ParseConfig> tableConfigList) {
         String location = parseRecourse.getLocation();
-        Long parserType = parseRecourse.getParserType();
+
         // 创建 File 对象
         File directory = new File(location);
         // 检查目录是否存在
@@ -135,24 +137,40 @@ public class ParseRecourseServiceImpl implements IParseRecourseService {
         if (files == null || files.length == 0) {
             throw new ServiceException("目录为空: " + location);
         }
-
+        // todo 解析入子表
+        // 获得所有子资源
+        List<ParseRecourseFile> parseRecourseFiles = new ArrayList<>();
         // 遍历文件和子目录
-        for (File file : files) {
-            SpirePDFTableParser parser = new SpirePDFTableParser();
-            List<PDFTable> tableList = parser.parse(file.getAbsolutePath());
-            List<Pair<String, TableParseRule<?>>> pairList = TableExtractorConvertor.convert(tableConfigList);
-            for (Pair<String, TableParseRule<?>> pair : pairList) {
-                String key = pair.getKey();
-                TableParseRule<?> parseRule = pair.getValue();
-                Object execute = parseRule.execute(tableList);
-                parseResult(parseRecourse, key, execute);
-            }
-        }
+        parseRecourseFiles.forEach(this::doParse);
     }
 
-    public void parseResult(ParseRecourse parseRecourse, String tableConfig, Object parseResult) {
-        System.out.println(parseRecourse.getResourceTitle());
-        System.out.println(tableConfig);
+    public void doParse(ParseRecourseFile parseRecourseFile) {
+        String filePath = parseRecourseFile.getLocation();
+        // 根据文件资源 获取对应的解析配置
+        List<ParseConfig> parseConfigList = new ArrayList<>();
+        for (ParseConfig parseConfig : parseConfigList) {
+            ParseTypeEnum parseTypeEnum = ParseTypeEnum.get(parseConfig.getConfigType());
+            IParser iParser = ParserFactory.createParserByFilePath(parseRecourseFile.getLocation(), parseTypeEnum);
+            Object parsed = iParser.parse(filePath);
+            Pair<String, ? extends IExtractor<?, ?>> pair;
+            if (parseConfig.getTableMatchMethod().intValue() == TableMatchMethodEnum.KV.getCode()) {
+                pair = ExtractorConvertor.convertToMapExtractor(parseConfig);
+            } else if (parseConfig.getTableMatchMethod().intValue() == TableMatchMethodEnum.LIST.getCode()) {
+                pair = ExtractorConvertor.convertToListExtractor(parseConfig);
+            } else {
+                pair = ExtractorConvertor.convertToTextExtractor(parseConfig);
+            }
+            String key = pair.getKey();
+            IExtractor<?, ?> extractor = pair.getValue();
+            Object result = ((IExtractor<Object, ?>) extractor).extract(parsed);
+            parseResult(parseRecourseFile, parseConfig.getParseConfigDesc(), result);
+        }
+
+    }
+
+    public void parseResult(ParseRecourseFile parseRecourseFile, String desc, Object parseResult) {
+        System.out.println(parseRecourseFile);
+        System.out.println(desc);
         System.out.println(parseResult);
     }
 }

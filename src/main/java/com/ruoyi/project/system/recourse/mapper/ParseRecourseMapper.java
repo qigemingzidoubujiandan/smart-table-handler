@@ -1,7 +1,6 @@
 package com.ruoyi.project.system.recourse.mapper;
 
 import java.util.List;
-import com.ruoyi.project.system.recourse.domain.ParseRecourse;
 
 /**
  * 解析资源Mapper接口

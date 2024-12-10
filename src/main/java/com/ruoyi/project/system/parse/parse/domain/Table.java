@@ -14,7 +14,7 @@ public interface Table {
      */
     List<? extends Cell> getTh();
 
-    TableSourceEnum source();
+    FileTypeEnum source();
 
     /**
      * 是否抽取过

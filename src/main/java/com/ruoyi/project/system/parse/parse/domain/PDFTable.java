@@ -58,8 +58,8 @@ public class PDFTable implements Table {
     }
 
     @Override
-    public TableSourceEnum source() {
-        return TableSourceEnum.PDF;
+    public FileTypeEnum source() {
+        return FileTypeEnum.PDF;
     }
 
     @Override

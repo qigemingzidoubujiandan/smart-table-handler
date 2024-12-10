@@ -1,20 +1,19 @@
 package com.ruoyi.project.system.parse.parse.domain;
 
-public enum TableSourceEnum {
-    HTML(1, "html"),
-    PDF(2, "pdf"),
-    WORD(3, "word");
+public enum ParseTypeEnum {
+    TABLE(1, "table"),
+    TEXT(2, "text");
 
     private final Integer code;
     private final String desc;
 
-    TableSourceEnum(Integer code, String desc) {
+    ParseTypeEnum(Integer code, String desc) {
         this.code = code;
         this.desc = desc;
     }
 
-    public static TableSourceEnum get(Integer code) {
-        for (TableSourceEnum item : TableSourceEnum.values()) {
+    public static ParseTypeEnum get(Integer code) {
+        for (ParseTypeEnum item : ParseTypeEnum.values()) {
             if (item.getCode().equals(code)) {
                 return item;
             }
@@ -22,8 +21,8 @@ public enum TableSourceEnum {
         return null;
     }
 
-    public static TableSourceEnum getByDesc(String desc) {
-        for (TableSourceEnum item : TableSourceEnum.values()) {
+    public static ParseTypeEnum getByDesc(String desc) {
+        for (ParseTypeEnum item : ParseTypeEnum.values()) {
             if (item.getDesc().equals(desc)) {
                 return item;
             }

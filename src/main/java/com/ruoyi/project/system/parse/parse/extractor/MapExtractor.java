@@ -21,6 +21,7 @@ import java.util.Map;
  * <p>
  * K:产品管理人  V:兴银理财有限责任公司
  * K:产品托管人  V:兴业银行股份有限公司
+ *
  * @author chenl
  */
 @Slf4j
@@ -50,8 +51,14 @@ public class MapExtractor extends AbstractTableExtractor<Map<String, String>> {
         getParsedResult().putAll(map);
     }
 
+
     @Override
-    void doExecute(List<? extends Table> tables) {
+    public Map<String, String> extract(List<Table> tables) {
+        doExtract(tables);
+        return getParsedResult();
+    }
+
+    void doExtract(List<? extends Table> tables) {
         this.unresolvedTables = tables;
         extract_KV();
     }

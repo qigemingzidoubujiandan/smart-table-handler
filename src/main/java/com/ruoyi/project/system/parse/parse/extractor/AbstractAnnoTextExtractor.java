@@ -21,11 +21,11 @@ import static com.ruoyi.project.system.parse.parse.convert.UnitExtractConverter.
 
 @Slf4j
 @Data
-public abstract class TextExtractor<T> implements IExtractor<String, T> {
+public abstract class AbstractAnnoTextExtractor<T> implements IExtractor<String, T> {
 
     private T t;
 
-    protected TextExtractor() {
+    protected AbstractAnnoTextExtractor() {
         t = ReflectUtil.newInstance(getGenericClazz());
     }
 

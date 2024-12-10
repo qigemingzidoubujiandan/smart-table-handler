@@ -1,25 +1,12 @@
 package com.ruoyi.project.system.parse.service.impl;
 
-import java.io.File;
 import java.util.List;
 
-import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.lang.Pair;
-import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.DateUtils;
-import com.ruoyi.common.utils.file.FileUtils;
-import com.ruoyi.project.system.parse.parse.domain.PDFTable;
-import com.ruoyi.project.system.parse.parse.domain.Table;
-import com.ruoyi.project.system.parse.parse.extractor.TableExtractorConvertor;
-import com.ruoyi.project.system.parse.parse.extractor.TableParseRule;
-import com.ruoyi.project.system.parse.parse.extractor.TableParser;
-import com.ruoyi.project.system.parse.parse.parser.SpirePDFTableParser;
-import com.ruoyi.project.system.recourse.domain.ParseRecourse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.project.system.parse.mapper.ParseTableConfigMapper;
-import com.ruoyi.project.system.parse.domain.ParseTableConfig;
 import com.ruoyi.project.system.parse.service.IParseTableConfigService;
 import com.ruoyi.common.utils.text.Convert;
 

@@ -1,6 +1,6 @@
 package com.ruoyi.project.system.parse.parse.parser.manage;
 
-import com.ruoyi.project.system.parse.parse.extractor.TextExtractor;
+import com.ruoyi.project.system.parse.parse.extractor.AbstractTextExtractor;
 import com.ruoyi.project.system.parse.parse.parser.AbstractTextParser;
 import com.ruoyi.project.system.parse.parse.util.AssertUtil;
 import lombok.Getter;
@@ -10,12 +10,12 @@ public class TextParser<T> {
     @SuppressWarnings("rawtypes")
     private final AbstractTextParser parser;
 
-    private final TextExtractor<T> extractor;
+    private final AbstractTextExtractor<T> extractor;
 
     @Getter
     private String text;
 
-    private TextParser(AbstractTextParser<?> parser, TextExtractor<T> extractor) {
+    private TextParser(AbstractTextParser<?> parser, AbstractTextExtractor<T> extractor) {
         this.parser = parser;
         this.extractor = extractor;
     }
@@ -41,7 +41,7 @@ public class TextParser<T> {
 
         private AbstractTextParser<?> parser;
 
-        private TextExtractor<T> extractor;
+        private AbstractTextExtractor<T> extractor;
 
         private Builder() {
 
@@ -52,7 +52,7 @@ public class TextParser<T> {
             return this;
         }
 
-        public Builder<T> extractor(TextExtractor<T> extractor) {
+        public Builder<T> extractor(AbstractTextExtractor<T> extractor) {
             this.extractor = extractor;
             return this;
         }

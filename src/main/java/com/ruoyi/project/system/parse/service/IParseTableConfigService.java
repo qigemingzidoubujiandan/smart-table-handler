@@ -1,7 +1,6 @@
 package com.ruoyi.project.system.parse.service;
 
 import java.util.List;
-import com.ruoyi.project.system.parse.domain.ParseTableConfig;
 
 /**
  * 格配置Service接口
