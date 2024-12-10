@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.system.tableconfig.mapper.ParseConfigMapper">
+    
+    <resultMap type="ParseConfig" id="ParseConfigResult">
+        <result property="parseConfigId"    column="parse_config_id"    />
+        <result property="resourceId"    column="resource_id"    />
+        <result property="parseDesc"    column="parse_desc"    />
+        <result property="configType"    column="config_type"    />
+        <result property="tableType"    column="table_type"    />
+        <result property="tableMatchMethod"    column="table_match_method"    />
+        <result property="tableParserType"    column="table_parser_type"    />
+        <result property="tableConditions"    column="table_conditions"    />
+        <result property="tableExpectationRow"    column="table_expectation_row"    />
+        <result property="tableIsMergeSameTitle"    column="table_is_merge_same_title"    />
+        <result property="tableIsMergeRow"    column="table_is_merge_row"    />
+        <result property="tableInterpretConditions"    column="table_interpret_conditions"    />
+        <result property="textRegExpression"    column="text_reg_expression"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectParseConfigVo">
+        select parse_config_id, resource_id, parse_desc, config_type, table_type, table_match_method, table_parser_type, table_conditions, table_expectation_row, table_is_merge_same_title, table_is_merge_row, table_interpret_conditions, text_reg_expression, create_by, create_time, update_by, update_time, remark from parse_config
+    </sql>
+
+    <select id="selectParseConfigList" parameterType="ParseConfig" resultMap="ParseConfigResult">
+        <include refid="selectParseConfigVo"/>
+        <where>  
+            <if test="resourceId != null "> and resource_id = #{resourceId}</if>
+            <if test="parseDesc != null  and parseDesc != ''"> and parse_desc = #{parseDesc}</if>
+            <if test="configType != null "> and config_type = #{configType}</if>
+            <if test="textRegExpression != null  and textRegExpression != ''"> and text_reg_expression = #{textRegExpression}</if>
+        </where>
+    </select>
+    
+    <select id="selectParseConfigByParseConfigId" parameterType="Long" resultMap="ParseConfigResult">
+        <include refid="selectParseConfigVo"/>
+        where parse_config_id = #{parseConfigId}
+    </select>
+
+    <insert id="insertParseConfig" parameterType="ParseConfig" useGeneratedKeys="true" keyProperty="parseConfigId">
+        insert into parse_config
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="resourceId != null">resource_id,</if>
+            <if test="parseDesc != null and parseDesc != ''">parse_desc,</if>
+            <if test="configType != null">config_type,</if>
+            <if test="tableType != null">table_type,</if>
+            <if test="tableMatchMethod != null">table_match_method,</if>
+            <if test="tableParserType != null">table_parser_type,</if>
+            <if test="tableConditions != null and tableConditions != ''">table_conditions,</if>
+            <if test="tableExpectationRow != null">table_expectation_row,</if>
+            <if test="tableIsMergeSameTitle != null">table_is_merge_same_title,</if>
+            <if test="tableIsMergeRow != null">table_is_merge_row,</if>
+            <if test="tableInterpretConditions != null">table_interpret_conditions,</if>
+            <if test="textRegExpression != null">text_reg_expression,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="resourceId != null">#{resourceId},</if>
+            <if test="parseDesc != null and parseDesc != ''">#{parseDesc},</if>
+            <if test="configType != null">#{configType},</if>
+            <if test="tableType != null">#{tableType},</if>
+            <if test="tableMatchMethod != null">#{tableMatchMethod},</if>
+            <if test="tableParserType != null">#{tableParserType},</if>
+            <if test="tableConditions != null and tableConditions != ''">#{tableConditions},</if>
+            <if test="tableExpectationRow != null">#{tableExpectationRow},</if>
+            <if test="tableIsMergeSameTitle != null">#{tableIsMergeSameTitle},</if>
+            <if test="tableIsMergeRow != null">#{tableIsMergeRow},</if>
+            <if test="tableInterpretConditions != null">#{tableInterpretConditions},</if>
+            <if test="textRegExpression != null">#{textRegExpression},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateParseConfig" parameterType="ParseConfig">
+        update parse_config
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="resourceId != null">resource_id = #{resourceId},</if>
+            <if test="parseDesc != null and parseDesc != ''">parse_desc = #{parseDesc},</if>
+            <if test="configType != null">config_type = #{configType},</if>
+            <if test="tableType != null">table_type = #{tableType},</if>
+            <if test="tableMatchMethod != null">table_match_method = #{tableMatchMethod},</if>
+            <if test="tableParserType != null">table_parser_type = #{tableParserType},</if>
+            <if test="tableConditions != null and tableConditions != ''">table_conditions = #{tableConditions},</if>
+            <if test="tableExpectationRow != null">table_expectation_row = #{tableExpectationRow},</if>
+            <if test="tableIsMergeSameTitle != null">table_is_merge_same_title = #{tableIsMergeSameTitle},</if>
+            <if test="tableIsMergeRow != null">table_is_merge_row = #{tableIsMergeRow},</if>
+            <if test="tableInterpretConditions != null">table_interpret_conditions = #{tableInterpretConditions},</if>
+            <if test="textRegExpression != null">text_reg_expression = #{textRegExpression},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where parse_config_id = #{parseConfigId}
+    </update>
+
+    <delete id="deleteParseConfigByParseConfigId" parameterType="Long">
+        delete from parse_config where parse_config_id = #{parseConfigId}
+    </delete>
+
+    <delete id="deleteParseConfigByParseConfigIds" parameterType="String">
+        delete from parse_config where parse_config_id in 
+        <foreach item="parseConfigId" collection="array" open="(" separator="," close=")">
+            #{parseConfigId}
+        </foreach>
+    </delete>
+
+</mapper>

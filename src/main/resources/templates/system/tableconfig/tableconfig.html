@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('解析配置列表')" />
+</head>
+<body class="gray-bg">
+     <div class="container-div">
+        <div class="row">
+            <div class="col-sm-12 search-collapse">
+                <form id="formId">
+                    <div class="select-list">
+                        <ul>
+                            <li>
+                                <label>所属资源id：</label>
+                                <input type="text" name="resourceId"/>
+                            </li>
+                            <li>
+                                <label>解析类型：</label>
+                                <select name="configType" th:with="type=${@dict.getType('parser_type')}">
+                                    <option value="">所有</option>
+                                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                                </select>
+                            </li>
+                            <li>
+                                <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+                                <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+
+            <div class="btn-group-sm" id="toolbar" role="group">
+                <a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="system:tableconfig:add">
+                    <i class="fa fa-plus"></i> 添加
+                </a>
+                <a class="btn btn-primary single disabled" onclick="$.operate.edit()" shiro:hasPermission="system:tableconfig:edit">
+                    <i class="fa fa-edit"></i> 修改
+                </a>
+                <a class="btn btn-danger multiple disabled" onclick="$.operate.removeAll()" shiro:hasPermission="system:tableconfig:remove">
+                    <i class="fa fa-remove"></i> 删除
+                </a>
+                <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="system:tableconfig:export">
+                    <i class="fa fa-download"></i> 导出
+                </a>
+            </div>
+            <div class="col-sm-12 select-table table-striped">
+                <table id="bootstrap-table"></table>
+            </div>
+        </div>
+    </div>
+    <th:block th:include="include :: footer" />
+    <script th:inline="javascript">
+        var editFlag = [[${@permission.hasPermi('system:tableconfig:edit')}]];
+        var removeFlag = [[${@permission.hasPermi('system:tableconfig:remove')}]];
+        var configTypeDatas = [[${@dict.getType('parser_type')}]];
+        var tableTypeDatas = [[${@dict.getType('table_type')}]];
+        var tableMatchMethodDatas = [[${@dict.getType('match_method')}]];
+        var prefix = ctx + "system/tableconfig";
+
+        $(function() {
+            var options = {
+                url: prefix + "/list",
+                createUrl: prefix + "/add",
+                updateUrl: prefix + "/edit/{id}",
+                removeUrl: prefix + "/remove",
+                exportUrl: prefix + "/export",
+                modalName: "解析配置",
+                columns: [{
+                    checkbox: true
+                },
+                {
+                    field: 'parseConfigId',
+                    title: '配置',
+                    visible: false
+                },
+                {
+                    field: 'resourceId',
+                    title: '所属资源id'
+                },
+                {
+                    field: 'parseDesc',
+                    title: '解析条件'
+                },
+                {
+                    field: 'configType',
+                    title: '解析类型',
+                    formatter: function(value, row, index) {
+                       return $.table.selectDictLabel(configTypeDatas, value);
+                    }
+                },
+                {
+                    field: 'tableType',
+                    title: '表格类型',
+                    formatter: function(value, row, index) {
+                       return $.table.selectDictLabel(tableTypeDatas, value);
+                    }
+                },
+                {
+                    field: 'tableMatchMethod',
+                    title: '匹配方式',
+                    formatter: function(value, row, index) {
+                       return $.table.selectDictLabel(tableMatchMethodDatas, value);
+                    }
+                },
+                {
+                    field: 'remark',
+                    title: '备注'
+                },
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        var actions = [];
+                        actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="$.operate.edit(\'' + row.parseConfigId + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="$.operate.remove(\'' + row.parseConfigId + '\')"><i class="fa fa-remove"></i>删除</a>');
+                        return actions.join('');
+                    }
+                }]
+            };
+            $.table.init(options);
+        });
+    </script>
+</body>
+</html>
