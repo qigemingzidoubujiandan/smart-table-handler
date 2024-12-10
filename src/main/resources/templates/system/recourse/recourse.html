@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
 <head>
-    <th:block th:include="include :: header('解析资源列表')" />
+    <th:block th:include="include :: header('资源列表')" />
 </head>
 <body class="gray-bg">
      <div class="container-div">
@@ -11,8 +11,15 @@
                     <div class="select-list">
                         <ul>
                             <li>
-                                <label>资源标题：</label>
-                                <input type="text" name="resourceTitle"/>
+                                <label>资源描述：</label>
+                                <input type="text" name="resourceDesc"/>
+                            </li>
+                            <li>
+                                <label>是否解析：</label>
+                                <select name="isParsed" th:with="type=${@dict.getType('yes_or_no')}">
+                                    <option value="">所有</option>
+                                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                                </select>
                             </li>
                             <li>
                                 <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
@@ -46,9 +53,7 @@
     <script th:inline="javascript">
         var editFlag = [[${@permission.hasPermi('system:recourse:edit')}]];
         var removeFlag = [[${@permission.hasPermi('system:recourse:remove')}]];
-        var resourceTypeDatas = [[${@dict.getType('table_type')}]];
-        var matchMethodDatas = [[${@dict.getType('match_method')}]];
-        var parserTypeDatas = [[${@dict.getType('parser_type')}]];
+        var isParsedDatas = [[${@dict.getType('yes_or_no')}]];
         var prefix = ctx + "system/recourse";
 
         $(function() {
@@ -58,7 +63,7 @@
                 updateUrl: prefix + "/edit/{id}",
                 removeUrl: prefix + "/remove",
                 exportUrl: prefix + "/export",
-                modalName: "解析资源",
+                modalName: "资源",
                 columns: [{
                     checkbox: true
                 },
@@ -68,28 +73,14 @@
                     visible: false
                 },
                 {
-                    field: 'resourceTitle',
-                    title: '资源标题'
+                    field: 'resourceDesc',
+                    title: '资源描述'
                 },
                 {
-                    field: 'resourceType',
-                    title: '资源类型(1:KV型, 2:列表型)',
+                    field: 'isParsed',
+                    title: '是否解析',
                     formatter: function(value, row, index) {
-                       return $.table.selectDictLabel(resourceTypeDatas, value);
-                    }
-                },
-                {
-                    field: 'matchMethod',
-                    title: '匹配方式(1:精确, 2:模糊)',
-                    formatter: function(value, row, index) {
-                       return $.table.selectDictLabel(matchMethodDatas, value);
-                    }
-                },
-                {
-                    field: 'parserType',
-                    title: '解析器类型(0:全部,1:spire, 2:py表格处理，3:Tabula)',
-                    formatter: function(value, row, index) {
-                       return $.table.selectDictLabel(parserTypeDatas, value);
+                       return $.table.selectDictLabel(isParsedDatas, value);
                     }
                 },
                 {

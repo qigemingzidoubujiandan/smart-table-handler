@@ -1,176 +1,164 @@
 package com.ruoyi.project.system.recourse.service.impl;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import com.ruoyi.common.exception.ServiceException;
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.ZipUtil;
+import com.github.junrar.Junrar;
+import com.google.common.collect.Lists;
 import com.ruoyi.common.utils.DateUtils;
-import com.ruoyi.project.system.parse.domain.ParseConfig;
-import com.ruoyi.project.system.parse.domain.ParseRecourse;
-import com.ruoyi.project.system.parse.domain.ParseRecourseFile;
-import com.ruoyi.project.system.parse.mapper.ParseTableConfigMapper;
-import com.ruoyi.project.system.parse.parse.domain.ParseTypeEnum;
-import com.ruoyi.project.system.parse.parse.domain.TableMatchMethodEnum;
-import com.ruoyi.project.system.parse.parse.extractor.ExtractorConvertor;
-import com.ruoyi.project.system.parse.parse.extractor.IExtractor;
-import com.ruoyi.project.system.parse.parse.parser.IParser;
-import com.ruoyi.project.system.parse.parse.parser.ParserFactory;
-import org.apache.commons.lang3.tuple.Pair;
+import com.ruoyi.common.utils.file.FileTypeUtils;
+import com.ruoyi.common.utils.file.FileUtils;
+import com.ruoyi.framework.config.RuoYiConfig;
+import com.ruoyi.project.system.file.domain.ParseRecourseFile;
+import com.ruoyi.project.system.file.mapper.ParseRecourseFileMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.project.system.recourse.mapper.ParseRecourseMapper;
+import com.ruoyi.project.system.recourse.domain.ParseRecourse;
 import com.ruoyi.project.system.recourse.service.IParseRecourseService;
 import com.ruoyi.common.utils.text.Convert;
 
 /**
- * 解析资源Service业务层处理
- *
+ * 资源Service业务层处理
+ * 
  * @author ruoyi
- * @date 2024-12-09
+ * @date 2024-12-10
  */
 @Service
-public class ParseRecourseServiceImpl implements IParseRecourseService {
+public class ParseRecourseServiceImpl implements IParseRecourseService 
+{
     @Autowired
     private ParseRecourseMapper parseRecourseMapper;
+
     @Autowired
-    private ParseTableConfigMapper parseTableConfigMapper;
+    private ParseRecourseFileMapper parseRecourseFileMapper;
 
     /**
-     * 查询解析资源
-     *
-     * @param resourceId 解析资源主键
-     * @return 解析资源
+     * 查询资源
+     * 
+     * @param resourceId 资源主键
+     * @return 资源
      */
     @Override
-    public ParseRecourse selectParseRecourseByResourceId(Long resourceId) {
+    public ParseRecourse selectParseRecourseByResourceId(Long resourceId)
+    {
         return parseRecourseMapper.selectParseRecourseByResourceId(resourceId);
     }
 
     /**
-     * 查询解析资源列表
-     *
-     * @param parseRecourse 解析资源
-     * @return 解析资源
+     * 查询资源列表
+     * 
+     * @param parseRecourse 资源
+     * @return 资源
      */
     @Override
-    public List<ParseRecourse> selectParseRecourseList(ParseRecourse parseRecourse) {
+    public List<ParseRecourse> selectParseRecourseList(ParseRecourse parseRecourse)
+    {
         return parseRecourseMapper.selectParseRecourseList(parseRecourse);
     }
 
     /**
-     * 新增解析资源
-     *
-     * @param parseRecourse 解析资源
+     * 新增资源
+     * 
+     * @param parseRecourse 资源
      * @return 结果
      */
     @Override
-    public int insertParseRecourse(ParseRecourse parseRecourse) {
+    public int insertParseRecourse(ParseRecourse parseRecourse, String packagefileName)
+    {
+        int i = parseRecourseMapper.insertParseRecourse(parseRecourse);
         parseRecourse.setCreateTime(DateUtils.getNowDate());
-        return parseRecourseMapper.insertParseRecourse(parseRecourse);
+        // 本地资源路径
+        List<String> files = obtainFile(RuoYiConfig.getProfile() + packagefileName);
+        List<ParseRecourseFile> list = Lists.newArrayList();
+        files.forEach(file -> {
+            ParseRecourseFile recourseFile = new ParseRecourseFile();
+            recourseFile.setResourceId(parseRecourse.getResourceId());
+            recourseFile.setFileName(file);
+            recourseFile.setFileType(FileTypeUtils.getFileType(file));
+            recourseFile.setLocation(file);
+            recourseFile.setIsParsed(0L);
+            list.add(recourseFile);
+            parseRecourseFileMapper.insertParseRecourseFile(recourseFile);
+        });
+        return i;
     }
 
+    private List<String> obtainFile(String absolutePath) {
+        try {
+            if (absolutePath.contains(".zip")) {
+                return getAllFile(absolutePath);
+            } else if (absolutePath.contains(".pdf")) {
+                return Lists.newArrayList(absolutePath);
+            } else if (absolutePath.contains(".rar")) {
+                File zdir = new File(absolutePath.substring(0, absolutePath.indexOf(".")));
+                if (!zdir.isDirectory()) {
+                    zdir.mkdir();
+                }
+                return Junrar.extract(absolutePath, zdir.getAbsolutePath()).stream().map(File::getAbsolutePath)
+                        .collect(Collectors.toList());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return Collections.emptyList();
+    }
+
+    private List<String> getAllFile(String absolutePath) {
+        File unzip = ZipUtil.unzip(absolutePath, Charset.forName("GBK"));
+        try (Stream<Path> paths = Files.walk(Paths.get(unzip.getPath()))) {
+            return paths.filter(Files::isRegularFile).map(r -> r.toFile().getAbsolutePath())
+                    .collect(Collectors.toList());
+        } catch (IOException e) {
+            e.printStackTrace();
+            return Collections.emptyList();
+        }
+    }
     /**
-     * 修改解析资源
-     *
-     * @param parseRecourse 解析资源
+     * 修改资源
+     * 
+     * @param parseRecourse 资源
      * @return 结果
      */
     @Override
-    public int updateParseRecourse(ParseRecourse parseRecourse) {
+    public int updateParseRecourse(ParseRecourse parseRecourse)
+    {
         parseRecourse.setUpdateTime(DateUtils.getNowDate());
         return parseRecourseMapper.updateParseRecourse(parseRecourse);
     }
 
     /**
-     * 批量删除解析资源
-     *
-     * @param resourceIds 需要删除的解析资源主键
+     * 批量删除资源
+     * 
+     * @param resourceIds 需要删除的资源主键
      * @return 结果
      */
     @Override
-    public int deleteParseRecourseByResourceIds(String resourceIds) {
+    public int deleteParseRecourseByResourceIds(String resourceIds)
+    {
         return parseRecourseMapper.deleteParseRecourseByResourceIds(Convert.toStrArray(resourceIds));
     }
 
     /**
-     * 删除解析资源信息
-     *
-     * @param resourceId 解析资源主键
+     * 删除资源信息
+     * 
+     * @param resourceId 资源主键
      * @return 结果
      */
     @Override
-    public int deleteParseRecourseByResourceId(Long resourceId) {
+    public int deleteParseRecourseByResourceId(Long resourceId)
+    {
         return parseRecourseMapper.deleteParseRecourseByResourceId(resourceId);
-    }
-
-
-    /**
-     * 解析资源
-     *
-     * @param recourseId 资源主键
-     */
-    @Override
-    public boolean parseTableConfigByRecourseId(Long recourseId) {
-        ParseRecourse parseRecourse = parseRecourseMapper.selectParseRecourseByResourceId(1L);
-        ParseConfig parseTableConfig = new ParseConfig();
-        parseTableConfig.setResourceId(1L);
-        List<ParseConfig> parseTableConfigs = null;//parseTableConfigMapper.selectParseTableConfigList(parseTableConfig);
-
-        parse(parseRecourse, parseTableConfigs);
-        return true;
-    }
-
-
-    public void parse(ParseRecourse parseRecourse, List<ParseConfig> tableConfigList) {
-        String location = parseRecourse.getLocation();
-
-        // 创建 File 对象
-        File directory = new File(location);
-        // 检查目录是否存在
-        if (!directory.exists()) {
-            throw new ServiceException("指定的目录不存在: " + location);
-        }
-        // 获取目录下的所有文件和子目录
-        File[] files = directory.listFiles();
-        // 检查是否有文件或子目录
-        if (files == null || files.length == 0) {
-            throw new ServiceException("目录为空: " + location);
-        }
-        // todo 解析入子表
-        // 获得所有子资源
-        List<ParseRecourseFile> parseRecourseFiles = new ArrayList<>();
-        // 遍历文件和子目录
-        parseRecourseFiles.forEach(this::doParse);
-    }
-
-    public void doParse(ParseRecourseFile parseRecourseFile) {
-        String filePath = parseRecourseFile.getLocation();
-        // 根据文件资源 获取对应的解析配置
-        List<ParseConfig> parseConfigList = new ArrayList<>();
-        for (ParseConfig parseConfig : parseConfigList) {
-            ParseTypeEnum parseTypeEnum = ParseTypeEnum.get(parseConfig.getConfigType());
-            IParser iParser = ParserFactory.createParserByFilePath(parseRecourseFile.getLocation(), parseTypeEnum);
-            Object parsed = iParser.parse(filePath);
-            Pair<String, ? extends IExtractor<?, ?>> pair;
-            if (parseConfig.getTableMatchMethod().intValue() == TableMatchMethodEnum.KV.getCode()) {
-                pair = ExtractorConvertor.convertToMapExtractor(parseConfig);
-            } else if (parseConfig.getTableMatchMethod().intValue() == TableMatchMethodEnum.LIST.getCode()) {
-                pair = ExtractorConvertor.convertToListExtractor(parseConfig);
-            } else {
-                pair = ExtractorConvertor.convertToTextExtractor(parseConfig);
-            }
-            String key = pair.getKey();
-            IExtractor<?, ?> extractor = pair.getValue();
-            Object result = ((IExtractor<Object, ?>) extractor).extract(parsed);
-            parseResult(parseRecourseFile, parseConfig.getParseConfigDesc(), result);
-        }
-
-    }
-
-    public void parseResult(ParseRecourseFile parseRecourseFile, String desc, Object parseResult) {
-        System.out.println(parseRecourseFile);
-        System.out.println(desc);
-        System.out.println(parseResult);
     }
 }

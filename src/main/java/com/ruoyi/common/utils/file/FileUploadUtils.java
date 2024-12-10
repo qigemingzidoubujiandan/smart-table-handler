@@ -147,6 +147,13 @@ public class FileUploadUtils
         return Constants.RESOURCE_PREFIX + "/" + currentDir + "/" + fileName;
     }
 
+    public static final String getPathFileNameWithoutPrefix(String uploadDir, String fileName) throws IOException
+    {
+        int dirLastIndex = RuoYiConfig.getProfile().length() + 1;
+        String currentDir = StringUtils.substring(uploadDir, dirLastIndex);
+        return "/" + currentDir + "/" + fileName;
+    }
+
     /**
      * 文件大小校验
      *
