@@ -80,7 +80,6 @@ public class ParseRecourseController extends BaseController {
     @ResponseBody
     public AjaxResult addSave(@RequestParam("file") MultipartFile file,
                               @RequestParam("resourceDesc") String resourceDesc,
-                              @RequestParam("location") String location,
                               @RequestParam("remark") String remark) throws IOException
     {
         // 上传文件路径
@@ -91,7 +90,6 @@ public class ParseRecourseController extends BaseController {
         // 构建资源对象并保存到数据库
         ParseRecourse parseRecourse = new ParseRecourse();
         parseRecourse.setResourceDesc(resourceDesc);
-        parseRecourse.setLocation(location);
         parseRecourse.setRemark(remark);
         parseRecourse.setLocation(upload);
 

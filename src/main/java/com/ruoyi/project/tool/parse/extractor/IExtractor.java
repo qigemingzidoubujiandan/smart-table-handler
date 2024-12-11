@@ -1,9 +1,5 @@
 package com.ruoyi.project.tool.parse.extractor;
 
-import com.ruoyi.project.tool.parse.domain.Table;
-
-import java.util.List;
-
 /**
  * 处理
  */

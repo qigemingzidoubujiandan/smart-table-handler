@@ -9,12 +9,16 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.text.CharSequenceUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.ZipUtil;
+import cn.hutool.json.JSONUtil;
 import com.github.junrar.Junrar;
 import com.google.common.collect.Lists;
 import com.ruoyi.common.exception.ServiceException;
@@ -41,6 +45,8 @@ import com.ruoyi.project.system.recourse.mapper.ParseRecourseMapper;
 import com.ruoyi.project.system.recourse.domain.ParseRecourse;
 import com.ruoyi.project.system.recourse.service.IParseRecourseService;
 import com.ruoyi.common.utils.text.Convert;
+
+import static com.ruoyi.common.constant.FileConstants.SUPPORT_FILE_SUFFIX;
 
 /**
  * 资源Service业务层处理
@@ -114,7 +120,7 @@ public class ParseRecourseServiceImpl implements IParseRecourseService {
         try {
             if (absolutePath.contains(".zip")) {
                 return getAllFile(absolutePath);
-            } else if (absolutePath.contains(".pdf")) {
+            } else if (CharSequenceUtil.containsAny(absolutePath, SUPPORT_FILE_SUFFIX)) {
                 return Lists.newArrayList(absolutePath);
             } else if (absolutePath.contains(".rar")) {
                 File zdir = new File(absolutePath.substring(0, absolutePath.indexOf(".")));
@@ -203,13 +209,14 @@ public class ParseRecourseServiceImpl implements IParseRecourseService {
 //            throw new ServiceException("目录为空: " + location);
 //        }
         // 获得所有子资源
+        Long resourceId = parseRecourse.getResourceId();
         ParseRecourseFile parseRecourseFile = new ParseRecourseFile();
-        parseRecourseFile.setResourceId(parseRecourse.getResourceId());
+        parseRecourseFile.setResourceId(resourceId);
         List<ParseRecourseFile> parseRecourseFiles = parseRecourseFileMapper.selectParseRecourseFileList(parseRecourseFile);
 
         // 根据文件资源 获取对应的解析配置
         ParseConfig parseConfigReq = new ParseConfig();
-        parseConfigReq.setResourceId(parseConfigReq.getResourceId());
+        parseConfigReq.setResourceId(resourceId);
         List<ParseConfig> parseConfigList = parseConfigMapper.selectParseConfigList(parseConfigReq);
         if (CollUtil.isEmpty(parseConfigList)) {
             throw new ServiceException("未配置解析规则");
@@ -245,7 +252,9 @@ public class ParseRecourseServiceImpl implements IParseRecourseService {
         result.setResourceId(parseConfig.getResourceId());
         result.setParseConfigId(parseConfig.getParseConfigId());
         result.setRecourseFileId(parseRecourseFile.getRecourseFileId());
-        result.setResult(parseResult.toString());
+        if (Objects.nonNull(parseResult)) {
+            result.setResult(JSONUtil.toJsonStr(parseResult));
+        }
         parseResultMapper.insertParseResult(result);
     }
 }

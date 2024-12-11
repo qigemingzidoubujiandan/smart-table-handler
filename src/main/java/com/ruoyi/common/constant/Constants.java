@@ -119,4 +119,9 @@ public class Constants
      */
     public static final String[] JOB_ERROR_STR = { "java.net.URL", "javax.naming.InitialContext", "org.yaml.snakeyaml",
             "org.springframework", "com.ruoyi.common.utils.file", "com.ruoyi.framework.config", "com.ruoyi.project.tool" };
+
+    /** 是 */
+    public static final String YES = "1";
+    /** 否 */
+    public static final String NO = "0";
 }
