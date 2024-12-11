@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.ZipUtil;
 import com.github.junrar.Junrar;
@@ -23,6 +24,8 @@ import com.ruoyi.common.utils.file.FileUtils;
 import com.ruoyi.framework.config.RuoYiConfig;
 import com.ruoyi.project.system.file.domain.ParseRecourseFile;
 import com.ruoyi.project.system.file.mapper.ParseRecourseFileMapper;
+import com.ruoyi.project.system.result.domain.ParseResult;
+import com.ruoyi.project.system.result.mapper.ParseResultMapper;
 import com.ruoyi.project.system.tableconfig.domain.ParseConfig;
 import com.ruoyi.project.system.tableconfig.mapper.ParseConfigMapper;
 import com.ruoyi.project.tool.parse.domain.ParseTypeEnum;
@@ -55,6 +58,9 @@ public class ParseRecourseServiceImpl implements IParseRecourseService {
 
     @Autowired
     private ParseConfigMapper parseConfigMapper;
+
+    @Autowired
+    private ParseResultMapper parseResultMapper;
 
     /**
      * 查询资源
@@ -205,6 +211,9 @@ public class ParseRecourseServiceImpl implements IParseRecourseService {
         ParseConfig parseConfigReq = new ParseConfig();
         parseConfigReq.setResourceId(parseConfigReq.getResourceId());
         List<ParseConfig> parseConfigList = parseConfigMapper.selectParseConfigList(parseConfigReq);
+        if (CollUtil.isEmpty(parseConfigList)) {
+            throw new ServiceException("未配置解析规则");
+        }
         // 遍历文件和子目录
         parseRecourseFiles.forEach(r -> doParse(r, parseConfigList));
     }
@@ -218,14 +227,7 @@ public class ParseRecourseServiceImpl implements IParseRecourseService {
             Object parsed = iParser.parse(filePath);
 
             // 2.获取抽取器->抽取
-            Pair<String, ? extends IExtractor<?, ?>> pair;
-            if (parseConfig.getTableMatchMethod().intValue() == TableMatchMethodEnum.KV.getCode()) {
-                pair = ExtractorConvertor.convertToMapExtractor(parseConfig);
-            } else if (parseConfig.getTableMatchMethod().intValue() == TableMatchMethodEnum.LIST.getCode()) {
-                pair = ExtractorConvertor.convertToListExtractor(parseConfig);
-            } else {
-                pair = ExtractorConvertor.convertToTextExtractor(parseConfig);
-            }
+            Pair<String, ? extends IExtractor<?, ?>> pair = ExtractorConvertor.createExtractor(parseConfig);
 
             // 3.对结果进行处理
             String key = pair.getKey();
@@ -239,7 +241,11 @@ public class ParseRecourseServiceImpl implements IParseRecourseService {
         System.out.println(parseRecourseFile);
         System.out.println(parseConfig);
         System.out.println(parseResult);
-        // todo:
-
+        ParseResult result = new ParseResult();
+        result.setResourceId(parseConfig.getResourceId());
+        result.setParseConfigId(parseConfig.getParseConfigId());
+        result.setRecourseFileId(parseRecourseFile.getRecourseFileId());
+        result.setResult(parseResult.toString());
+        parseResultMapper.insertParseResult(result);
     }
 }

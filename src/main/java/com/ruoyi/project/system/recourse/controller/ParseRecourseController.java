@@ -37,7 +37,6 @@ public class ParseRecourseController extends BaseController {
     @Autowired
     private ServerConfig serverConfig;
 
-    @RequiresPermissions("system:recourse:view")
     @GetMapping()
     public String recourse() {
         return prefix + "/recourse";
@@ -46,7 +45,6 @@ public class ParseRecourseController extends BaseController {
     /**
      * 查询资源列表
      */
-    @RequiresPermissions("system:recourse:list")
     @PostMapping("/list")
     @ResponseBody
     public TableDataInfo list(ParseRecourse parseRecourse) {
@@ -58,7 +56,6 @@ public class ParseRecourseController extends BaseController {
     /**
      * 导出资源列表
      */
-    @RequiresPermissions("system:recourse:export")
     @Log(title = "资源", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     @ResponseBody
@@ -78,7 +75,6 @@ public class ParseRecourseController extends BaseController {
     /**
      * 新增保存资源（含文件上传）
      */
-    @RequiresPermissions("system:recourse:add")
     @Log(title = "资源", businessType = BusinessType.INSERT)
     @PostMapping("/add")
     @ResponseBody
@@ -106,15 +102,14 @@ public class ParseRecourseController extends BaseController {
      * 解析资源
      */
     @Log(title = "资源", businessType = BusinessType.OTHER)
-    @PostMapping("/parse")
+    @PostMapping("/parse/{resourceId}")
     @ResponseBody
-    public AjaxResult parse(Long id) {
-        return toAjax(parseRecourseService.parseResource(id));
+    public AjaxResult parse(@PathVariable("resourceId")Long resourceId) {
+        return toAjax(parseRecourseService.parseResource(resourceId));
     }
     /**
      * 修改资源
      */
-    @RequiresPermissions("system:recourse:edit")
     @GetMapping("/edit/{resourceId}")
     public String edit(@PathVariable("resourceId") Long resourceId, ModelMap mmap) {
         ParseRecourse parseRecourse = parseRecourseService.selectParseRecourseByResourceId(resourceId);
@@ -125,7 +120,6 @@ public class ParseRecourseController extends BaseController {
     /**
      * 修改保存资源
      */
-    @RequiresPermissions("system:recourse:edit")
     @Log(title = "资源", businessType = BusinessType.UPDATE)
     @PostMapping("/edit")
     @ResponseBody
@@ -136,7 +130,6 @@ public class ParseRecourseController extends BaseController {
     /**
      * 删除资源
      */
-    @RequiresPermissions("system:recourse:remove")
     @Log(title = "资源", businessType = BusinessType.DELETE)
     @PostMapping("/remove")
     @ResponseBody

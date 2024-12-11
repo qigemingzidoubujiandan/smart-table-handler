@@ -2,9 +2,11 @@ package com.ruoyi.project.tool.parse.extractor;
 
 import com.ruoyi.common.utils.text.Convert;
 import com.ruoyi.project.system.tableconfig.domain.ParseConfig;
+import com.ruoyi.project.tool.parse.domain.ParseTypeEnum;
 import com.ruoyi.project.tool.parse.domain.Table;
 import com.ruoyi.project.tool.parse.domain.TableMatchMethodEnum;
 import org.apache.commons.lang3.tuple.Pair;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +16,20 @@ import java.util.regex.Pattern;
  * @author chenl
  */
 public class ExtractorConvertor {
+
+    public static <T, R> Pair<String, ? extends IExtractor<?, ?>> createExtractor(ParseConfig parseConfig) {
+        Pair<String, ? extends IExtractor<?, ?>> pair = null;
+        if (parseConfig.getConfigType().intValue() == ParseTypeEnum.TABLE.getCode()) {
+            if (parseConfig.getTableMatchMethod().intValue() == TableMatchMethodEnum.KV.getCode()) {
+                pair = ExtractorConvertor.convertToMapExtractor(parseConfig);
+            } else if (parseConfig.getTableMatchMethod().intValue() == TableMatchMethodEnum.LIST.getCode()) {
+                pair = ExtractorConvertor.convertToListExtractor(parseConfig);
+            }
+        } else {
+            pair = ExtractorConvertor.convertToTextExtractor(parseConfig);
+        }
+        return pair;
+    }
 
     // 泛型工厂方法接口
     @FunctionalInterface
