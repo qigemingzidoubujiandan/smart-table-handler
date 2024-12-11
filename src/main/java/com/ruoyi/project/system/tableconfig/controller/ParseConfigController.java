@@ -1,6 +1,9 @@
 package com.ruoyi.project.system.tableconfig.controller;
 
 import java.util.List;
+
+import com.ruoyi.project.system.recourse.domain.ParseRecourse;
+import com.ruoyi.project.system.recourse.service.IParseRecourseService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -21,23 +24,24 @@ import com.ruoyi.framework.web.page.TableDataInfo;
 
 /**
  * 解析配置Controller
- * 
+ *
  * @author zz
  * @date 2024-12-10
  */
 @Controller
 @RequestMapping("/system/tableconfig")
-public class ParseConfigController extends BaseController
-{
+public class ParseConfigController extends BaseController {
     private String prefix = "system/tableconfig";
 
     @Autowired
     private IParseConfigService parseConfigService;
 
+    @Autowired
+    private IParseRecourseService parseRecourseService;
+
     @RequiresPermissions("system:tableconfig:view")
     @GetMapping()
-    public String tableconfig()
-    {
+    public String tableconfig() {
         return prefix + "/tableconfig";
     }
 
@@ -47,8 +51,7 @@ public class ParseConfigController extends BaseController
     @RequiresPermissions("system:tableconfig:list")
     @PostMapping("/list")
     @ResponseBody
-    public TableDataInfo list(ParseConfig parseConfig)
-    {
+    public TableDataInfo list(ParseConfig parseConfig) {
         startPage();
         List<ParseConfig> list = parseConfigService.selectParseConfigList(parseConfig);
         return getDataTable(list);
@@ -61,8 +64,7 @@ public class ParseConfigController extends BaseController
     @Log(title = "解析配置", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     @ResponseBody
-    public AjaxResult export(ParseConfig parseConfig)
-    {
+    public AjaxResult export(ParseConfig parseConfig) {
         List<ParseConfig> list = parseConfigService.selectParseConfigList(parseConfig);
         ExcelUtil<ParseConfig> util = new ExcelUtil<ParseConfig>(ParseConfig.class);
         return util.exportExcel(list, "解析配置数据");
@@ -72,8 +74,8 @@ public class ParseConfigController extends BaseController
      * 新增解析配置
      */
     @GetMapping("/add")
-    public String add()
-    {
+    public String add(ModelMap mmap) {
+        mmap.put("resources", parseRecourseService.selectParseRecourseList(new ParseRecourse()));  //这里key是需要待会和前端对应的，稍后会备注，value就是我查询到的一个结果
         return prefix + "/add";
     }
 
@@ -84,8 +86,7 @@ public class ParseConfigController extends BaseController
     @Log(title = "解析配置", businessType = BusinessType.INSERT)
     @PostMapping("/add")
     @ResponseBody
-    public AjaxResult addSave(ParseConfig parseConfig)
-    {
+    public AjaxResult addSave(ParseConfig parseConfig) {
         return toAjax(parseConfigService.insertParseConfig(parseConfig));
     }
 
@@ -94,8 +95,7 @@ public class ParseConfigController extends BaseController
      */
     @RequiresPermissions("system:tableconfig:edit")
     @GetMapping("/edit/{parseConfigId}")
-    public String edit(@PathVariable("parseConfigId") Long parseConfigId, ModelMap mmap)
-    {
+    public String edit(@PathVariable("parseConfigId") Long parseConfigId, ModelMap mmap) {
         ParseConfig parseConfig = parseConfigService.selectParseConfigByParseConfigId(parseConfigId);
         mmap.put("parseConfig", parseConfig);
         return prefix + "/edit";
@@ -108,8 +108,7 @@ public class ParseConfigController extends BaseController
     @Log(title = "解析配置", businessType = BusinessType.UPDATE)
     @PostMapping("/edit")
     @ResponseBody
-    public AjaxResult editSave(ParseConfig parseConfig)
-    {
+    public AjaxResult editSave(ParseConfig parseConfig) {
         return toAjax(parseConfigService.updateParseConfig(parseConfig));
     }
 
@@ -118,10 +117,9 @@ public class ParseConfigController extends BaseController
      */
     @RequiresPermissions("system:tableconfig:remove")
     @Log(title = "解析配置", businessType = BusinessType.DELETE)
-    @PostMapping( "/remove")
+    @PostMapping("/remove")
     @ResponseBody
-    public AjaxResult remove(String ids)
-    {
+    public AjaxResult remove(String ids) {
         return toAjax(parseConfigService.deleteParseConfigByParseConfigIds(ids));
     }
 }

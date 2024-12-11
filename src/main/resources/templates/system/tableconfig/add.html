@@ -6,23 +6,17 @@
 <body class="white-bg">
     <div class="wrapper wrapper-content animated fadeInRight ibox-content">
         <form class="form-horizontal m" id="form-tableconfig-add">
-            <div class="col-xs-12">
+            <div class="col-xs-12" id = "resource-section">
                 <div class="form-group">
-                    <label class="col-sm-3 control-label">所属资源id：</label>
+                    <label class="col-sm-3 control-label">所属资源：</label>
                     <div class="col-sm-8">
-                        <input name="resourceId" class="form-control" type="text">
+                        <select id="resourceId" name="resourceId" class="form-control select2-multiple">
+                            <option th:each="post:${resources}" th:value="${post.resourceId}"  th:text="${post.resourceDesc}" ></option>
+                        </select>
                     </div>
                 </div>
             </div>
-            <div class="col-xs-12">
-                <div class="form-group">
-                    <label class="col-sm-3 control-label is-required">解析条件：</label>
-                    <div class="col-sm-8">
-                        <textarea name="parseDesc" class="form-control" required></textarea>
-                    </div>
-                </div>
-            </div>
-            <div class="col-xs-12">
+            <div class="col-xs-12" id="parse-type-section">
                 <div class="form-group">
                     <label class="col-sm-3 control-label">解析类型：</label>
                     <div class="col-sm-8">
@@ -33,6 +27,15 @@
                     </div>
                 </div>
             </div>
+            <div class="col-xs-12" id="parse-desc-section">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label is-required">解析描述：</label>
+                    <div class="col-sm-8">
+                        <input name="parseDesc" class="form-control" required></input>
+                    </div>
+                </div>
+            </div>
+
             <div class="col-xs-12">
                 <div class="form-group">
                     <label class="col-sm-3 control-label">表格类型：</label>
@@ -51,6 +54,17 @@
                         <div class="radio-box" th:each="dict : ${@dict.getType('match_method')}">
                             <input type="radio" th:id="${'tableMatchMethod_' + dict.dictCode}" name="tableMatchMethod" th:value="${dict.dictValue}" th:checked="${dict.default}">
                             <label th:for="${'tableMatchMethod_' + dict.dictCode}" th:text="${dict.dictLabel}"></label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">合并表格行：</label>
+                    <div class="col-sm-8">
+                        <div class="radio-box" th:each="dict : ${@dict.getType('yes_or_no')}">
+                            <input type="radio" th:id="${'tableMatchMethod_' + dict.dictCode}" name="tableIsMergeRow" th:value="${dict.dictValue}" th:checked="${dict.default}">
+                            <label th:for="${'tableIsMergeRow_' + dict.dictCode}" th:text="${dict.dictLabel}"></label>
                         </div>
                     </div>
                 </div>
@@ -79,23 +93,16 @@
                     </div>
                 </div>
             </div>
+
             <div class="col-xs-12">
                 <div class="form-group">
-                    <label class="col-sm-3 control-label">合并表格行：</label>
-                    <div class="col-sm-8">
-                        <input name="tableIsMergeRow" class="form-control" type="text">
-                    </div>
-                </div>
-            </div>
-            <div class="col-xs-12">
-                <div class="form-group">
-                    <label class="col-sm-3 control-label">中断表格：</label>
+                    <label class="col-sm-3 control-label">中断表格(抽取过程文本包含立即中断匹配)：</label>
                     <div class="col-sm-8">
                         <textarea name="tableInterpretConditions" class="form-control"></textarea>
                     </div>
                 </div>
             </div>
-            <div class="col-xs-12">
+            <div class="col-xs-12" id="text-regexp-section">
                 <div class="form-group">
                     <label class="col-sm-3 control-label">文本:正则表达式：</label>
                     <div class="col-sm-8">
@@ -116,6 +123,32 @@
     <th:block th:include="include :: footer" />
     <script th:inline="javascript">
         var prefix = ctx + "system/tableconfig"
+
+        // 初始化时根据默认选中的单选按钮设置显示状态
+        updateFormVisibility();
+
+        // 监听解析类型的改变
+        $('input[name="configType"]').change(function () {
+            updateFormVisibility();
+        });
+
+        function updateFormVisibility() {
+            var selectedConfigType = $('input[name="configType"]:checked').val();
+
+            if (selectedConfigType === '2') { // 假设2对应的是需要显示文本:正则表达式的配置类型
+                // 显示特定部分
+                $('#parse-type-section, #resource-section, #parse-desc-section, #text-regexp-section').show();
+                // 隐藏其他所有部分
+                $('.col-xs-12').not('#parse-type-section, #resource-section, #parse-desc-section, #text-regexp-section').hide();
+            } else {
+                // 显示除了文本:正则表达式之外的所有部分
+                $('#resource-section, #parse-desc-section').show();
+                $('#text-regexp-section').hide();
+                // 显示其他所有部分
+                $('.col-xs-12').not('#text-regexp-section').show();
+            }
+        }
+
         $("#form-tableconfig-add").validate({
             focusCleanup: true
         });
