@@ -14,6 +14,7 @@
                                 <label>所属资源：</label>
                                 <div class="col-sm-8">
                                     <select id="resourceId" name="resourceId" class="form-control select2-multiple">
+                                        <option value="">所有</option>
                                         <option th:each="post:${resources}" th:value="${post.resourceId}"  th:text="${post.resourceDesc}"></option>
                                     </select>
                                 </div>
