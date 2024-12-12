@@ -1,6 +1,10 @@
 package com.ruoyi.project.system.file.controller;
 
 import java.util.List;
+
+import com.ruoyi.project.system.file.domain.ParseRecourseFileDTO;
+import com.ruoyi.project.system.recourse.domain.ParseRecourse;
+import com.ruoyi.project.system.recourse.service.IParseRecourseService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -34,10 +38,15 @@ public class ParseRecourseFileController extends BaseController
     @Autowired
     private IParseRecourseFileService parseRecourseFileService;
 
+    @Autowired
+    private IParseRecourseService parseRecourseService;
+
     @RequiresPermissions("system:file:view")
     @GetMapping()
-    public String file()
+    public String file( ModelMap mmap)
     {
+        mmap.put("resources", parseRecourseService.selectParseRecourseList(new ParseRecourse()));
+        startPage();
         return prefix + "/file";
     }
 
@@ -47,10 +56,10 @@ public class ParseRecourseFileController extends BaseController
     @RequiresPermissions("system:file:list")
     @PostMapping("/list")
     @ResponseBody
-    public TableDataInfo list(ParseRecourseFile parseRecourseFile)
+    public TableDataInfo list(ParseRecourseFileDTO parseRecourseFile)
     {
         startPage();
-        List<ParseRecourseFile> list = parseRecourseFileService.selectParseRecourseFileList(parseRecourseFile);
+        List<ParseRecourseFileDTO> list = parseRecourseFileService.selectParseRecourseFileList(parseRecourseFile);
         return getDataTable(list);
     }
 
@@ -63,7 +72,7 @@ public class ParseRecourseFileController extends BaseController
     @ResponseBody
     public AjaxResult export(ParseRecourseFile parseRecourseFile)
     {
-        List<ParseRecourseFile> list = parseRecourseFileService.selectParseRecourseFileList(parseRecourseFile);
+        List<ParseRecourseFile> list = parseRecourseFileService.selectList(parseRecourseFile);
         ExcelUtil<ParseRecourseFile> util = new ExcelUtil<ParseRecourseFile>(ParseRecourseFile.class);
         return util.exportExcel(list, "文件资源数据");
     }

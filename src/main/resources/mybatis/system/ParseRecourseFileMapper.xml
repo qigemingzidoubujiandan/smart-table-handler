@@ -22,9 +22,31 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         select recourse_file_id, resource_id, file_name, file_type, location, is_parsed, create_by, create_time, update_by, update_time, remark from parse_recourse_file
     </sql>
 
-    <select id="selectParseRecourseFileList" parameterType="ParseRecourseFile" resultMap="ParseRecourseFileResult">
-        <include refid="selectParseRecourseFileVo"/>
+    <select id="selectParseRecourseFileList" parameterType="ParseRecourseFileDTO" resultMap="ParseRecourseFileResult">
+        select f.recourse_file_id,
+               r.resource_desc,
+               f.resource_id,
+               f.file_name,
+               f.file_type,
+               f.location,
+               f.is_parsed,
+               f.create_by,
+               f.create_time,
+               f.update_by,
+               f.update_time,
+               f.remark from parse_recourse_file f inner join parse_recourse r on f.resource_id = r.resource_id
+
         <where>  
+            <if test="resourceId != null "> and f.resource_id = #{resourceId}</if>
+            <if test="fileName != null  and fileName != ''"> and f.file_name like concat('%', #{fileName}, '%')</if>
+            <if test="resourceDesc != null  and resourceDesc != ''"> and r.resource_desc like concat('%', #{resourceDesc}, '%')</if>
+            <if test="isParsed != null "> and f.is_parsed = #{isParsed}</if>
+        </where>
+    </select>
+
+    <select id="selectList" parameterType="ParseRecourseFileDTO" resultMap="ParseRecourseFileResult">
+        <include refid="selectParseRecourseFileVo"/>
+        <where>
             <if test="resourceId != null "> and resource_id = #{resourceId}</if>
             <if test="fileName != null  and fileName != ''"> and file_name like concat('%', #{fileName}, '%')</if>
             <if test="isParsed != null "> and is_parsed = #{isParsed}</if>

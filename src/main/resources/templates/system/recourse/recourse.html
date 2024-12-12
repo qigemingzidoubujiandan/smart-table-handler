@@ -18,7 +18,7 @@
                                 <label>是否解析：</label>
                                 <select name="isParsed" th:with="type=${@dict.getType('yes_or_no')}">
                                     <option value="">所有</option>
-                                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}" ></option>
                                 </select>
                             </li>
                             <li>
@@ -65,12 +65,16 @@
                 data : {
                 },
                 async : false,
+                beforeSend: function () {
+                    $.modal.loading("正在处理中，请稍候...");
+                    $.modal.disable();
+                },
                 error : function(request) {
                     $.modal.alertError("系统错误");
                 },
                 success: function(result) {
                     $.operate.successCallback(result);
-                },
+                }
             });
         }
         $(function() {
@@ -97,13 +101,7 @@
                     field: 'isParsed',
                     title: '是否解析',
                     formatter: function(value, row, index) {
-                        if (value === 1) {
-                            return '已解析';
-                        } else if (value === 2) {
-                            return "解析中";
-                        } else {
-                            return "未解析";
-                        }
+                        return $.table.selectDictLabel(isParsedDatas, value);
                     }
                 },
                 {

@@ -65,6 +65,6 @@ public interface IParseRecourseService {
      * @param resourceId 需要解析资源主键
      * @return 结果
      */
-    public boolean parseResource(Long resourceId);
+    public int parseResource(Long resourceId);
 
     }

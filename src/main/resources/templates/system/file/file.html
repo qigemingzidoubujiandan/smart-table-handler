@@ -11,6 +11,14 @@
                     <div class="select-list">
                         <ul>
                             <li>
+                                <label>所属资源：</label>
+                                <div class="col-sm-8">
+                                    <select id="resourceId" name="resourceId" class="form-control select2-multiple">
+                                        <option th:each="post:${resources}" th:value="${post.resourceId}"  th:text="${post.resourceDesc}"></option>
+                                    </select>
+                                </div>
+                            </li>
+                            <li>
                                 <label>是否解析：</label>
                                 <select name="isParsed" th:with="type=${@dict.getType('yes_or_no')}">
                                     <option value="">所有</option>
@@ -69,8 +77,8 @@
                     visible: false
                 },
                 {
-                    field: 'resourceId',
-                    title: '资源id'
+                    field: 'resourceDesc',
+                    title: '所属资源'
                 },
                 {
                     field: 'fileName',

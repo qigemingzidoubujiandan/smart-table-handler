@@ -98,6 +98,9 @@ public class ParseConfigController extends BaseController {
     public String edit(@PathVariable("parseConfigId") Long parseConfigId, ModelMap mmap) {
         ParseConfig parseConfig = parseConfigService.selectParseConfigByParseConfigId(parseConfigId);
         mmap.put("parseConfig", parseConfig);
+
+        mmap.put("resources", parseRecourseService.selectParseRecourseList(new ParseRecourse()));  //这里key是需要待会和前端对应的，稍后会备注，value就是我查询到的一个结果
+        mmap.put("defaultResourceId", parseConfig.getResourceId());
         return prefix + "/edit";
     }
 
@@ -108,7 +111,7 @@ public class ParseConfigController extends BaseController {
     @Log(title = "解析配置", businessType = BusinessType.UPDATE)
     @PostMapping("/edit")
     @ResponseBody
-    public AjaxResult editSave(ParseConfig parseConfig) {
+    public AjaxResult editSave(ParseConfig parseConfig, ModelMap mmap) {
         return toAjax(parseConfigService.updateParseConfig(parseConfig));
     }
 

@@ -369,7 +369,7 @@ public class Convert
         {
             return new String[] {};
         }
-        return toStrArray(",", str);
+        return toStrArray(",|，", str);
     }
 
     /**

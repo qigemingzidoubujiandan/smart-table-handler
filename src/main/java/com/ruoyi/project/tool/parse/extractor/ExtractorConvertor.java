@@ -20,9 +20,9 @@ public class ExtractorConvertor {
     public static <T, R> Pair<String, ? extends IExtractor<?, ?>> createExtractor(ParseConfig parseConfig) {
         Pair<String, ? extends IExtractor<?, ?>> pair = null;
         if (parseConfig.getConfigType().intValue() == ParseTypeEnum.TABLE.getCode()) {
-            if (parseConfig.getTableMatchMethod().intValue() == TableMatchMethodEnum.KV.getCode()) {
+            if (parseConfig.getTableType().intValue() == TableMatchMethodEnum.KV.getCode()) {
                 pair = ExtractorConvertor.convertToMapExtractor(parseConfig);
-            } else if (parseConfig.getTableMatchMethod().intValue() == TableMatchMethodEnum.LIST.getCode()) {
+            } else if (parseConfig.getTableType().intValue() == TableMatchMethodEnum.LIST.getCode()) {
                 pair = ExtractorConvertor.convertToListExtractor(parseConfig);
             }
         } else {

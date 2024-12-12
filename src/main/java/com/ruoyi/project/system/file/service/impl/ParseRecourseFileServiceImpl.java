@@ -2,6 +2,8 @@ package com.ruoyi.project.system.file.service.impl;
 
 import java.util.List;
 import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.project.system.file.domain.ParseRecourseFileDTO;
+import com.ruoyi.project.system.recourse.mapper.ParseRecourseMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.project.system.file.mapper.ParseRecourseFileMapper;
@@ -20,6 +22,8 @@ public class ParseRecourseFileServiceImpl implements IParseRecourseFileService
 {
     @Autowired
     private ParseRecourseFileMapper parseRecourseFileMapper;
+    @Autowired
+    private ParseRecourseMapper parseRecourseMapper;
 
     /**
      * 查询文件资源
@@ -40,7 +44,7 @@ public class ParseRecourseFileServiceImpl implements IParseRecourseFileService
      * @return 文件资源
      */
     @Override
-    public List<ParseRecourseFile> selectParseRecourseFileList(ParseRecourseFile parseRecourseFile)
+    public List<ParseRecourseFileDTO> selectParseRecourseFileList(ParseRecourseFileDTO parseRecourseFile)
     {
         return parseRecourseFileMapper.selectParseRecourseFileList(parseRecourseFile);
     }
@@ -93,5 +97,10 @@ public class ParseRecourseFileServiceImpl implements IParseRecourseFileService
     public int deleteParseRecourseFileByRecourseFileId(Long recourseFileId)
     {
         return parseRecourseFileMapper.deleteParseRecourseFileByRecourseFileId(recourseFileId);
+    }
+
+    @Override
+    public List<ParseRecourseFile> selectList(ParseRecourseFile parseRecourseFile) {
+        return parseRecourseFileMapper.selectList(parseRecourseFile);
     }
 }

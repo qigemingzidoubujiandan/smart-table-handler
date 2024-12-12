@@ -2,6 +2,7 @@ package com.ruoyi.project.system.file.service;
 
 import java.util.List;
 import com.ruoyi.project.system.file.domain.ParseRecourseFile;
+import com.ruoyi.project.system.file.domain.ParseRecourseFileDTO;
 
 /**
  * 文件资源Service接口
@@ -25,7 +26,7 @@ public interface IParseRecourseFileService
      * @param parseRecourseFile 文件资源
      * @return 文件资源集合
      */
-    public List<ParseRecourseFile> selectParseRecourseFileList(ParseRecourseFile parseRecourseFile);
+    public List<ParseRecourseFileDTO> selectParseRecourseFileList(ParseRecourseFileDTO parseRecourseFile);
 
     /**
      * 新增文件资源
@@ -58,4 +59,7 @@ public interface IParseRecourseFileService
      * @return 结果
      */
     public int deleteParseRecourseFileByRecourseFileId(Long recourseFileId);
+
+    public List<ParseRecourseFile> selectList(ParseRecourseFile parseRecourseFile);
+
 }

@@ -2,6 +2,7 @@ package com.ruoyi.project.system.file.mapper;
 
 import java.util.List;
 import com.ruoyi.project.system.file.domain.ParseRecourseFile;
+import com.ruoyi.project.system.file.domain.ParseRecourseFileDTO;
 
 /**
  * 文件资源Mapper接口
@@ -25,7 +26,15 @@ public interface ParseRecourseFileMapper
      * @param parseRecourseFile 文件资源
      * @return 文件资源集合
      */
-    public List<ParseRecourseFile> selectParseRecourseFileList(ParseRecourseFile parseRecourseFile);
+    public List<ParseRecourseFileDTO> selectParseRecourseFileList(ParseRecourseFileDTO parseRecourseFile);
+
+    /**
+     * 查询文件资源列表
+     *
+     * @param parseRecourseFile 文件资源
+     * @return 文件资源集合
+     */
+    public List<ParseRecourseFile> selectList(ParseRecourseFile parseRecourseFile);
 
     /**
      * 新增文件资源

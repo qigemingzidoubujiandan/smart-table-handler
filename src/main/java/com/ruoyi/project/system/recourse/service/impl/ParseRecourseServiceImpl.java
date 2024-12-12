@@ -6,25 +6,22 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ZipUtil;
 import cn.hutool.json.JSONUtil;
 import com.github.junrar.Junrar;
 import com.google.common.collect.Lists;
+import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.file.FileTypeUtils;
-import com.ruoyi.common.utils.file.FileUtils;
 import com.ruoyi.framework.config.RuoYiConfig;
 import com.ruoyi.project.system.file.domain.ParseRecourseFile;
 import com.ruoyi.project.system.file.mapper.ParseRecourseFileMapper;
@@ -33,7 +30,6 @@ import com.ruoyi.project.system.result.mapper.ParseResultMapper;
 import com.ruoyi.project.system.tableconfig.domain.ParseConfig;
 import com.ruoyi.project.system.tableconfig.mapper.ParseConfigMapper;
 import com.ruoyi.project.tool.parse.domain.ParseTypeEnum;
-import com.ruoyi.project.tool.parse.domain.TableMatchMethodEnum;
 import com.ruoyi.project.tool.parse.extractor.ExtractorConvertor;
 import com.ruoyi.project.tool.parse.extractor.IExtractor;
 import com.ruoyi.project.tool.parse.parser.IParser;
@@ -187,10 +183,37 @@ public class ParseRecourseServiceImpl implements IParseRecourseService {
      * @param recourseId 资源主键
      */
     @Override
-    public boolean parseResource(Long recourseId) {
+    public int parseResource(Long recourseId) {
         ParseRecourse parseRecourse = parseRecourseMapper.selectParseRecourseByResourceId(recourseId);
+        // 先删除之前解析结果
+        clearPrevResult(parseRecourse.getResourceId());
+        // 进行解析
         parse(parseRecourse);
-        return true;
+        parseRecourse.setIsParsed(Long.parseLong(Constants.YES));
+        parseRecourse.setUpdateTime(DateUtils.getNowDate());
+        return parseRecourseMapper.updateParseRecourse(parseRecourse);
+    }
+
+    public void clearPrevResult(Long recourseId) {
+        ParseRecourseFile parseRecourseFile = new ParseRecourseFile();
+        parseRecourseFile.setResourceId(recourseId);
+        List<ParseRecourseFile> parseRecourseFiles = parseRecourseFileMapper.selectList(parseRecourseFile);
+
+        ParseResult parseResult = new ParseResult();
+        parseResult.setResourceId(recourseId);
+        List<ParseResult> parseResults = parseResultMapper.selectParseResultList(parseResult);
+
+//        // 删除文件资源
+//        String[] fileIdArr = parseRecourseFiles.stream().map(ParseRecourseFile::getRecourseFileId).map(String::valueOf).toArray(String[]::new);
+//        if (fileIdArr.length > 0) {
+//            parseRecourseFileMapper.deleteParseRecourseFileByRecourseFileIds(fileIdArr);
+//        }
+
+        // 删除解析结果
+        String[] array = parseResults.stream().map(ParseResult::getParseResultId).map(String::valueOf).toArray(String[]::new);
+        if (array.length > 0) {
+            parseResultMapper.deleteParseResultByParseResultIds(array);
+        }
     }
 
 
@@ -212,7 +235,7 @@ public class ParseRecourseServiceImpl implements IParseRecourseService {
         Long resourceId = parseRecourse.getResourceId();
         ParseRecourseFile parseRecourseFile = new ParseRecourseFile();
         parseRecourseFile.setResourceId(resourceId);
-        List<ParseRecourseFile> parseRecourseFiles = parseRecourseFileMapper.selectParseRecourseFileList(parseRecourseFile);
+        List<ParseRecourseFile> parseRecourseFiles = parseRecourseFileMapper.selectList(parseRecourseFile);
 
         // 根据文件资源 获取对应的解析配置
         ParseConfig parseConfigReq = new ParseConfig();
@@ -242,6 +265,9 @@ public class ParseRecourseServiceImpl implements IParseRecourseService {
             Object result = ((IExtractor<Object, ?>) extractor).extract(parsed);
             parseResult(parseRecourseFile, parseConfig, result);
         }
+        parseRecourseFile.setIsParsed(Long.parseLong(Constants.YES));
+        parseRecourseFile.setUpdateTime(DateUtils.getNowDate());
+        parseRecourseFileMapper.updateParseRecourseFile(parseRecourseFile);
     }
 
     public void parseResult(ParseRecourseFile parseRecourseFile, ParseConfig parseConfig, Object parseResult) {
