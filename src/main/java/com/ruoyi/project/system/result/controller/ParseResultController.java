@@ -62,6 +62,14 @@ public class ParseResultController extends BaseController
         return prefix + "/result";
     }
 
+    @GetMapping("/resultDetails")
+    @ResponseBody
+    public String result(Long parseResultId)
+    {
+        ParseResult parseResult = parseResultService.selectParseResultByParseResultId(parseResultId);
+        return parseResult.getResult();
+    }
+
     /**
      * 查询解析结果列表
      */

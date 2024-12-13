@@ -67,74 +67,154 @@
             <div class="col-sm-12 select-table table-striped">
                 <table id="bootstrap-table"></table>
             </div>
-        </div>
-    </div>
-    <th:block th:include="include :: footer" />
-    <script th:inline="javascript">
-        var editFlag = [[${@permission.hasPermi('system:result:edit')}]];
-        var removeFlag = [[${@permission.hasPermi('system:result:remove')}]];
-        var prefix = ctx + "system/result";
 
-        $(function() {
-            var options = {
-                url: prefix + "/list",
-                createUrl: prefix + "/add",
-                updateUrl: prefix + "/edit/{id}",
-                removeUrl: prefix + "/remove",
-                exportUrl: prefix + "/export",
-                modalName: "解析结果",
-                columns: [{
-                    checkbox: true
-                },
-                {
-                    field: 'parseResultId',
-                    title: '解析结果id',
-                    visible: false
-                },
-                {
-                    field: 'resourceDesc',
-                    title: '所属资源'
-                },
-                {
-                    field: 'fileName',
-                    title: '所属文件'
-                },
-                {
-                    field: 'parseDesc',
-                    title: '所属配置'
-                },
-                {
-                    field: 'result',
-                    title: '解析结果',
-                    formatter: function(value, row, index) {
-                        return value.substring(0,100) + "......";
-                        // 确保 value 是一个数组
-                        if (Array.isArray(value)) {
-                            // 直接返回每个元素，用 <br> 分隔
-                            return value.join('<br>');
-                        } else {
-                            // 如果不是数组，尝试将 value 转换为字符串
-                            return typeof value === 'object' ? JSON.stringify(value) : String(value);
-                        }
-                    }
-                },
-                {
-                    field: 'remark',
-                    title: '备注'
-                },
-                {
-                    title: '操作',
-                    align: 'center',
-                    formatter: function(value, row, index) {
-                        var actions = [];
-                        // actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="$.operate.edit(\'' + row.parseResultId + '\')"><i class="fa fa-edit"></i>编辑</a> ');
-                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="$.operate.remove(\'' + row.parseResultId + '\')"><i class="fa fa-remove"></i>删除</a>');
-                        return actions.join('');
-                    }
-                }]
-            };
-            $.table.init(options);
-        });
-    </script>
+
+            <div class="modal inmodal" id="myModal" tabindex="-1" role="dialog" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title">解析结果</h1>
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <!-- 使用 <table> 来显示解析结果 -->
+                            <table id="detailsTable" class="table table-bordered table-striped" style="display:none;">
+                                <thead></thead>
+                                <tbody></tbody>
+                            </table>
+                            <!-- 使用 <pre> 标签来展示非表格内容 -->
+                            <pre id="modalContent" style="display:none;"></pre>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+     </div>
+     <th:block th:include="include :: footer" />
+     <script th:inline="javascript">
+         var editFlag = [[${@permission.hasPermi('system:result:edit')}]];
+         var removeFlag = [[${@permission.hasPermi('system:result:remove')}]];
+         var prefix = ctx + "system/result";
+
+         $(function() {
+             var options = {
+                 url: prefix + "/list",
+                 createUrl: prefix + "/add",
+                 updateUrl: prefix + "/edit/{id}",
+                 removeUrl: prefix + "/remove",
+                 exportUrl: prefix + "/export",
+                 modalName: "解析结果",
+                 columns: [{
+                     checkbox: true
+                 },
+                     {
+                         field: 'parseResultId',
+                         title: '解析结果id',
+                         visible: false
+                     },
+                     {
+                         field: 'resourceDesc',
+                         title: '所属资源'
+                     },
+                     {
+                         field: 'fileName',
+                         title: '所属文件'
+                     },
+                     {
+                         field: 'parseDesc',
+                         title: '所属配置'
+                     },
+                     {
+                         field: 'result',
+                         title: '解析结果',
+                         formatter: function(value, row, index) {
+                             return value.substring(0, 100) + "......";
+                         }
+                     },
+                     {
+                         field: 'remark',
+                         title: '备注'
+                     },
+                     {
+                         title: '操作',
+                         align: 'center',
+                         formatter: function(value, row, index) {
+                             var actions = [];
+                             actions.push('<button type="button" class="btn btn-primary btn-xs" onclick="showResultDetails(\'' + row.parseResultId + '\')">详情</button>');
+                             actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="$.operate.remove(\'' + row.parseResultId + '\')"><i class="fa fa-remove"></i>删除</a>');
+                             return actions.join('');
+                         }
+                     }]
+             };
+             $.table.init(options);
+         });
+
+         function showResultDetails(id) {
+             $.ajax({
+                 url: prefix + "/resultDetails",
+                 method: 'GET',
+                 data: { parseResultId: id },
+                 success: function(response) {
+                     try {
+                         let isJsonArray = false;
+                         let content;
+
+                         // 尝试将响应解析为 JSON 数组
+                         try {
+                             content = JSON.parse(response);
+                             if (Array.isArray(content)) {
+                                 isJsonArray = true;
+                             } else {
+                                 content = response; // 如果不是数组，则保留原始字符串
+                             }
+                         } catch (e) {
+                             content = response; // 如果解析失败，则认为是普通字符串
+                         }
+
+                         // 清空之前的显示内容
+                         $('#detailsTable').hide().find('thead, tbody').empty();
+                         $('#modalContent').hide().text('');
+
+                         if (isJsonArray) {
+                             // 动态生成表格列
+                             var $thead = $('<tr></tr>');
+                             content[0].forEach(function(header) {
+                                 $thead.append('<th>' + header + '</th>');
+                             });
+                             $('#detailsTable thead').append($thead);
+
+                             // 填充表格行
+                             for (var i = 1; i < content.length; i++) {
+                                 var $row = $('<tr></tr>');
+                                 content[i].forEach(function(cell) {
+                                     $row.append('<td>' + cell + '</td>');
+                                 });
+                                 $('#detailsTable tbody').append($row);
+                             }
+
+                             // 显示表格
+                             $('#detailsTable').show();
+                         } else {
+                             // 直接展示字符串内容
+                             $('#modalContent').text(content).show();
+                         }
+
+                         $('#myModal').modal('show'); // 打开模态框
+
+                     } catch (error) {
+                         console.error("Error processing result details:", error);
+                         alert("无法加载解析结果，请稍后再试。");
+                     }
+                 },
+                 error: function(xhr, status, error) {
+                     console.error("Error fetching result details:", error);
+                     alert("无法加载解析结果，请稍后再试。");
+                 }
+             });
+         }
+     </script>
 </body>
 </html>
