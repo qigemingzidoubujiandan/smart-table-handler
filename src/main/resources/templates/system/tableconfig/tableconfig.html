@@ -11,8 +11,13 @@
                     <div class="select-list">
                         <ul>
                             <li>
-                                <label>所属资源id：</label>
-                                <input type="text" name="resourceId"/>
+                                <label>所属资源：</label>
+                                <div class="col-sm-8">
+                                    <select id="resourceId" name="resourceId" class="form-control select2-multiple">
+                                        <option value="">所有</option>
+                                        <option th:each="post:${resources}" th:value="${post.resourceId}"  th:text="${post.resourceDesc}"></option>
+                                    </select>
+                                </div>
                             </li>
                             <li>
                                 <label>解析类型：</label>
@@ -75,8 +80,8 @@
                     visible: false
                 },
                 {
-                    field: 'resourceId',
-                    title: '所属资源id'
+                    field: 'resourceDesc',
+                    title: '所属资源'
                 },
                 {
                     field: 'parseDesc',

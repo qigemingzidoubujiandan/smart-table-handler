@@ -2,6 +2,7 @@ package com.ruoyi.project.system.tableconfig.mapper;
 
 import java.util.List;
 import com.ruoyi.project.system.tableconfig.domain.ParseConfig;
+import com.ruoyi.project.system.tableconfig.domain.ParseConfigDTO;
 
 /**
  * 解析配置Mapper接口
@@ -25,7 +26,10 @@ public interface ParseConfigMapper
      * @param parseConfig 解析配置
      * @return 解析配置集合
      */
-    public List<ParseConfig> selectParseConfigList(ParseConfig parseConfig);
+    public List<ParseConfigDTO> selectParseConfigList(ParseConfig parseConfig);
+
+    public List<ParseConfig> selectList(ParseConfig parseConfig);
+
 
     /**
      * 新增解析配置

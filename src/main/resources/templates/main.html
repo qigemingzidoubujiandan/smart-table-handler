@@ -1,96 +1,106 @@
 <!DOCTYPE html>
-<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!--360浏览器优先以webkit内核解析-->
-    <title>若依介绍</title>
+    <title>智能表格处理 - 金融报告解析专家</title>
     <link rel="shortcut icon" href="favicon.ico">
     <link href="../static/css/bootstrap.min.css" th:href="@{/css/bootstrap.min.css}" rel="stylesheet"/>
     <link href="../static/css/font-awesome.min.css" th:href="@{/css/font-awesome.min.css}" rel="stylesheet"/>
     <link href="../static/css/style.min.css" th:href="@{/css/style.min.css}" rel="stylesheet"/>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f9f9f9;
+        }
+        .dashboard-header {
+            padding: 20px;
+            background-color: #ffffff;
+            border-bottom: 1px solid #e7e7e7;
+            margin-bottom: 20px;
+        }
+        .dashboard-header h1 {
+            color: #333;
+        }
+        .dashboard-header p {
+            color: #555;
+            line-height: 1.6;
+        }
+        .feature-box {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .feature-box h3 {
+            color: #333;
+            margin-top: 0;
+        }
+        .feature-box p {
+            color: #555;
+        }
+        .label-free {
+            background-color: #ffeb3b;
+            color: #000;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .technology-list li {
+            margin-bottom: 5px;
+        }
+    </style>
 </head>
 
 <body class="gray-bg">
-    <div class="row border-bottom white-bg dashboard-header">
-        <div class="col-sm-12">
-
-            <hr>
-        </div>
-        <div class="col-sm-3">
-            <h2></h2>
-            <small>：</small>
-            <br>
-            <br>
-
-            <br>
-        </div>
-        <div class="col-sm-5">
-            <h2>若依后台管理框架</h2>
-            <p>一直想做一款后台管理系统，看了很多优秀的开源项目但是发现没有合适自己的。于是利用空闲休息时间开始自己写一套后台系统。如此有了若依管理系统。，她可以用于所有的Web应用程序，如<b>网站管理后台</b>，<b>网站会员中心</b>，<b>CMS</b>，<b>CRM</b>，<b>OA</b>等等，当然，您也可以对她进行深度定制，以做出更强系统。所有前端后台代码封装过后十分精简易上手，出错概率低。同时支持移动客户端访问。系统会陆续更新一些实用功能。</p>
-            <p>
-                <b>当前版本：</b><span>v[[${version}]]</span>
-            </p>
-            <p>
-                <span class="label label-warning">&yen;免费开源</span>
-            </p>
-            <br>
-            <p>
-                <a class="btn btn-success btn-outline" href="https://gitee.com/y_project/RuoYi" target="_blank">
-                    <i class="fa fa-cloud"> </i> 访问码云
-                </a>
-                <a class="btn btn-white btn-bitbucket" href="http://ruoyi.vip" target="_blank">
-                    <i class="fa fa-home"></i> 访问主页
-                </a>
-            </p>
-        </div>
-        <div class="col-sm-4">
-            <h4>技术选型：</h4>
-            <ol>
-                <li>核心框架：Spring Boot。</li>
-                <li>安全框架：Apache Shiro。</li>
-                <li>模板引擎：Thymeleaf。</li>
-                <li>持久层框架：MyBatis。</li>
-				<li>定时任务:Quartz。</li>
-                <li>数据库连接池：Druid。</li>
-                <li>工具类：Fastjson。</li>
-                <li>更多……</li>
-            </ol>
-        </div>
-
+<div class="row border-bottom white-bg dashboard-header">
+    <div class="col-sm-12 text-center">
+        <h1>智能表格处理 - 金融报告解析专家</h1>
+        <p>专注于金融领域各种报告文档的高效解析与数据抽取。</p>
     </div>
-    <div class="wrapper wrapper-content">
-        <div class="row">
-            <div class="col-sm-4">
+</div>
 
-                <div class="ibox float-e-margins">
-                    <div class="ibox-title">
-                        <h5>联系信息</h5>
-
-                    </div>
-                    <div class="ibox-content">
-
-                    </div>
-                </div>
+<div class="container">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="feature-box">
+                <h3>主要功能</h3>
+                <p>我们构建了一套组件化的解析框架，支持通过页面配置解析抽取规则。利用jsoup、spirepdf、PDFPlumber、Tabula、POI等开源库，我们能够分别识别PDF、Word、HTML中的表格数据，并根据配置规则对这些表格数据进行处理和抽取。</p>
+                <p>我们的系统还特别针对跨页导致的单元格切割问题以及同标题表格合并等问题提供了有效的解决方案。</p>
             </div>
 
+            <div class="feature-box">
+                <h3>附加功能</h3>
+                <p>此外，我们还提供了基于页面配置的正则表达式提取功能，可以从文档内容中抽取关键文本信息。这一功能使得用户能够轻松获取某些特定格式或位置的关键内容，极大地方便了数据分析工作。</p>
+            </div>
+
+            <div class="feature-box">
+                <h3>技术选型</h3>
+                <ul class="technology-list">
+                    <li>核心框架：Spring Boot</li>
+                    <li>自研组件：表格智能处理</li>
+                    <li>工具类库：spirePDF、poi、jsoup、Tabula</li>
+                    <li>模板引擎：Thymeleaf</li>
+                    <li>持久层框架：MyBatis</li>
+                    <li>数据库连接池：Druid</li>
+                    <li>更多……</li>
+                </ul>
+            </div>
+
+            <div class="feature-box">
+                <p><b>当前版本：</b><span>v1.0</span></p>
+                <p><span class="label label-warning">&yen;免费开源</span></p>
+            </div>
         </div>
     </div>
-    <script th:src="@{/js/jquery.min.js}"></script>
-    <script th:src="@{/js/bootstrap.min.js}"></script>
-    <script th:src="@{/ajax/libs/layer/layer.min.js}"></script>
-    <script type="text/javascript">
-	    $('#pay-qrcode').click(function(){
-	        var html=$(this).html();
-	        parent.layer.open({
-	            title: false,
-	            type: 1,
-	            closeBtn:false,
-	            shadeClose:true,
-	            area: ['600px', '360px'],
-	            content: html
-	        });
-	    });
-    </script>
+</div>
+
+<script th:src="@{/js/jquery.min.js}"></script>
+<script th:src="@{/js/bootstrap.min.js}"></script>
+<script th:src="@{/ajax/libs/layer/layer.min.js}"></script>
+<script type="text/javascript">
+</script>
 </body>
 </html>

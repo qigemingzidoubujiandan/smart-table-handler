@@ -32,8 +32,6 @@
     </sql>
 
     <resultMap id="ParseResultResultDTO" type="ParseResultDTO">
-        <!-- 假设ParseResult是对应的Java类名 -->
-
         <id property="parseResultId" column="parse_result_id"/>
         <result property="resourceId" column="resource_id"/>
         <result property="resourceFileId" column="resource_file_id"/>
@@ -78,19 +76,19 @@
         select
         pr.parse_result_id,
         pr.resource_id,
-        pr.source_file_id,
+        pr.resource_file_id,
         pr.parse_config_id,
         pr.result,
         pr.create_by,
         pr.create_time,
         pr.update_by,
         pr.update_time,
-        pr.remark,
+        pr.remark
         from parse_result pr
         <where>
-            <if test="resourceId != null ">and resource_id = #{resourceId}</if>
-            <if test="resourceFileId != null ">and resource_file_id = #{resourceFileId}</if>
-            <if test="parseConfigId != null ">and parse_config_id = #{parseConfigId}</if>
+            <if test="resourceId != null ">and pr.resource_id = #{resourceId}</if>
+            <if test="resourceFileId != null ">and pr.resource_file_id = #{resourceFileId}</if>
+            <if test="parseConfigId != null ">and pr.parse_config_id = #{parseConfigId}</if>
         </where>
     </select>
 

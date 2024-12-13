@@ -241,7 +241,7 @@ public class ParseResourceServiceImpl implements IParseResourceService {
         // 根据文件资源 获取对应的解析配置
         ParseConfig parseConfigReq = new ParseConfig();
         parseConfigReq.setResourceId(resourceId);
-        List<ParseConfig> parseConfigList = parseConfigMapper.selectParseConfigList(parseConfigReq);
+        List<ParseConfig> parseConfigList = parseConfigMapper.selectList(parseConfigReq);
         if (CollUtil.isEmpty(parseConfigList)) {
             throw new ServiceException("未配置解析规则");
         }

@@ -2,8 +2,10 @@ package com.ruoyi.project.system.tableconfig.controller;
 
 import java.util.List;
 
+import com.ruoyi.project.system.file.domain.ParseResourceFile;
 import com.ruoyi.project.system.resource.domain.ParseResource;
 import com.ruoyi.project.system.resource.service.IParseResourceService;
+import com.ruoyi.project.system.tableconfig.domain.ParseConfigDTO;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -41,7 +43,8 @@ public class ParseConfigController extends BaseController {
 
     @RequiresPermissions("system:tableconfig:view")
     @GetMapping()
-    public String tableconfig() {
+    public String tableconfig(ModelMap mmap) {
+        mmap.put("resources", parseResourceService.selectParseResourceList(new ParseResource()));  //这里key是需要待会和前端对应的，稍后会备注，value就是我查询到的一个结果
         return prefix + "/tableconfig";
     }
 
@@ -53,7 +56,7 @@ public class ParseConfigController extends BaseController {
     @ResponseBody
     public TableDataInfo list(ParseConfig parseConfig) {
         startPage();
-        List<ParseConfig> list = parseConfigService.selectParseConfigList(parseConfig);
+        List<ParseConfigDTO> list = parseConfigService.selectParseConfigList(parseConfig);
         return getDataTable(list);
     }
 
@@ -65,7 +68,7 @@ public class ParseConfigController extends BaseController {
     @PostMapping("/export")
     @ResponseBody
     public AjaxResult export(ParseConfig parseConfig) {
-        List<ParseConfig> list = parseConfigService.selectParseConfigList(parseConfig);
+        List<ParseConfig> list = parseConfigService.selectList(parseConfig);
         ExcelUtil<ParseConfig> util = new ExcelUtil<ParseConfig>(ParseConfig.class);
         return util.exportExcel(list, "解析配置数据");
     }

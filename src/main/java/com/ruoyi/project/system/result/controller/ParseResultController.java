@@ -29,14 +29,13 @@ import com.ruoyi.framework.web.page.TableDataInfo;
 
 /**
  * 解析结果Controller
- * 
+ *
  * @author zhaochenliang
  * @date 2024-12-10
  */
 @Controller
 @RequestMapping("/system/result")
-public class ParseResultController extends BaseController
-{
+public class ParseResultController extends BaseController {
     private String prefix = "system/result";
 
     @Autowired
@@ -49,12 +48,11 @@ public class ParseResultController extends BaseController
     private IParseResourceService parseResourceService;
 
     @Autowired
-    private IParseResourceFileService  parseResourceFileService;
+    private IParseResourceFileService parseResourceFileService;
 
     @RequiresPermissions("system:result:view")
     @GetMapping()
-    public String result( ModelMap mmap)
-    {
+    public String result(ModelMap mmap) {
         mmap.put("parseConfigs", parseConfigService.selectParseConfigList(new ParseConfig()));
         mmap.put("resources", parseResourceService.selectParseResourceList(new ParseResource()));  //这里key是需要待会和前端对应的，稍后会备注，value就是我查询到的一个结果
         mmap.put("resourceFiles", parseResourceFileService.selectList(new ParseResourceFile()));  //这里key是需要待会和前端对应的，稍后会备注，value就是我查询到的一个结果
@@ -64,8 +62,7 @@ public class ParseResultController extends BaseController
 
     @GetMapping("/resultDetails")
     @ResponseBody
-    public String result(Long parseResultId)
-    {
+    public String result(Long parseResultId) {
         ParseResult parseResult = parseResultService.selectParseResultByParseResultId(parseResultId);
         return parseResult.getResult();
     }
@@ -76,7 +73,7 @@ public class ParseResultController extends BaseController
     @RequiresPermissions("system:result:list")
     @PostMapping("/list")
     @ResponseBody
-    public TableDataInfo list(ParseResult parseResult){
+    public TableDataInfo list(ParseResult parseResult) {
         startPage();
         List<ParseResultDTO> list = parseResultService.selectParseResultList(parseResult);
         return getDataTable(list);
@@ -89,8 +86,7 @@ public class ParseResultController extends BaseController
     @Log(title = "解析结果", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     @ResponseBody
-    public AjaxResult export(ParseResult parseResult)
-    {
+    public AjaxResult export(ParseResult parseResult) {
         List<ParseResult> list = parseResultService.selectList(parseResult);
         ExcelUtil<ParseResult> util = new ExcelUtil<ParseResult>(ParseResult.class);
         return util.exportExcel(list, "解析结果数据");
@@ -100,8 +96,7 @@ public class ParseResultController extends BaseController
      * 新增解析结果
      */
     @GetMapping("/add")
-    public String add()
-    {
+    public String add() {
         return prefix + "/add";
     }
 
@@ -112,8 +107,7 @@ public class ParseResultController extends BaseController
     @Log(title = "解析结果", businessType = BusinessType.INSERT)
     @PostMapping("/add")
     @ResponseBody
-    public AjaxResult addSave(ParseResult parseResult)
-    {
+    public AjaxResult addSave(ParseResult parseResult) {
         return toAjax(parseResultService.insertParseResult(parseResult));
     }
 
@@ -122,8 +116,7 @@ public class ParseResultController extends BaseController
      */
     @RequiresPermissions("system:result:edit")
     @GetMapping("/edit/{parseResultId}")
-    public String edit(@PathVariable("parseResultId") Long parseResultId, ModelMap mmap)
-    {
+    public String edit(@PathVariable("parseResultId") Long parseResultId, ModelMap mmap) {
         ParseResult parseResult = parseResultService.selectParseResultByParseResultId(parseResultId);
         mmap.put("parseResult", parseResult);
         return prefix + "/edit";
@@ -136,8 +129,7 @@ public class ParseResultController extends BaseController
     @Log(title = "解析结果", businessType = BusinessType.UPDATE)
     @PostMapping("/edit")
     @ResponseBody
-    public AjaxResult editSave(ParseResult parseResult)
-    {
+    public AjaxResult editSave(ParseResult parseResult) {
         return toAjax(parseResultService.updateParseResult(parseResult));
     }
 
@@ -146,10 +138,9 @@ public class ParseResultController extends BaseController
      */
     @RequiresPermissions("system:result:remove")
     @Log(title = "解析结果", businessType = BusinessType.DELETE)
-    @PostMapping( "/remove")
+    @PostMapping("/remove")
     @ResponseBody
-    public AjaxResult remove(String ids)
-    {
+    public AjaxResult remove(String ids) {
         return toAjax(parseResultService.deleteParseResultByParseResultIds(ids));
     }
 }
