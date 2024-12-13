@@ -92,20 +92,31 @@
                     visible: false
                 },
                 {
-                    field: 'resourceId',
-                    title: '资源id'
+                    field: 'resourceDesc',
+                    title: '所属资源'
                 },
                 {
-                    field: 'resourceFileId',
-                    title: '资源文件id'
+                    field: 'fileName',
+                    title: '所属文件'
                 },
                 {
-                    field: 'parseConfigId',
-                    title: '配置id'
+                    field: 'parseDesc',
+                    title: '所属配置'
                 },
                 {
                     field: 'result',
-                    title: '解析结果'
+                    title: '解析结果',
+                    formatter: function(value, row, index) {
+                        return value.substring(0,100) + "......";
+                        // 确保 value 是一个数组
+                        if (Array.isArray(value)) {
+                            // 直接返回每个元素，用 <br> 分隔
+                            return value.join('<br>');
+                        } else {
+                            // 如果不是数组，尝试将 value 转换为字符串
+                            return typeof value === 'object' ? JSON.stringify(value) : String(value);
+                        }
+                    }
                 },
                 {
                     field: 'remark',

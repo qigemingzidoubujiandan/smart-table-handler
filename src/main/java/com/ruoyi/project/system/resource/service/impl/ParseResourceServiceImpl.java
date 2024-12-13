@@ -22,6 +22,7 @@ import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.file.FileTypeUtils;
+import com.ruoyi.common.utils.file.FileUtils;
 import com.ruoyi.framework.config.RuoYiConfig;
 import com.ruoyi.project.system.file.domain.ParseResourceFile;
 import com.ruoyi.project.system.file.mapper.ParseResourceFileMapper;
@@ -102,7 +103,7 @@ public class ParseResourceServiceImpl implements IParseResourceService {
         files.forEach(file -> {
             ParseResourceFile resourceFile = new ParseResourceFile();
             resourceFile.setResourceId(parseResource.getResourceId());
-            resourceFile.setFileName(file);
+            resourceFile.setFileName(FileUtils.getName(file));
             resourceFile.setFileType(FileTypeUtils.getFileType(file));
             resourceFile.setLocation(file);
             resourceFile.setIsParsed(0L);
@@ -201,7 +202,7 @@ public class ParseResourceServiceImpl implements IParseResourceService {
 
         ParseResult parseResult = new ParseResult();
         parseResult.setResourceId(resourceId);
-        List<ParseResult> parseResults = parseResultMapper.selectParseResultList(parseResult);
+        List<ParseResult> parseResults = parseResultMapper.selectList(parseResult);
 
 //        // 删除文件资源
 //        String[] fileIdArr = parseResourceFiles.stream().map(ParseResourceFile::getResourceFileId).map(String::valueOf).toArray(String[]::new);

@@ -2,6 +2,7 @@ package com.ruoyi.project.system.result.service;
 
 import java.util.List;
 import com.ruoyi.project.system.result.domain.ParseResult;
+import com.ruoyi.project.system.result.domain.ParseResultDTO;
 
 /**
  * 解析结果Service接口
@@ -25,7 +26,9 @@ public interface IParseResultService
      * @param parseResult 解析结果
      * @return 解析结果集合
      */
-    public List<ParseResult> selectParseResultList(ParseResult parseResult);
+    public List<ParseResultDTO> selectParseResultList(ParseResult parseResult);
+
+    public List<ParseResult> selectList(ParseResult parseResult);
 
     /**
      * 新增解析结果

@@ -2,6 +2,7 @@ package com.ruoyi.project.system.result.mapper;
 
 import java.util.List;
 import com.ruoyi.project.system.result.domain.ParseResult;
+import com.ruoyi.project.system.result.domain.ParseResultDTO;
 
 /**
  * 解析结果Mapper接口
@@ -25,7 +26,14 @@ public interface ParseResultMapper
      * @param parseResult 解析结果
      * @return 解析结果集合
      */
-    public List<ParseResult> selectParseResultList(ParseResult parseResult);
+    public List<ParseResultDTO> selectParseResultList(ParseResult parseResult);
+    /**
+     * 查询解析结果列表
+     *
+     * @param parseResult 解析结果
+     * @return 解析结果集合
+     */
+    public List<ParseResult> selectList(ParseResult parseResult);
 
     /**
      * 新增解析结果

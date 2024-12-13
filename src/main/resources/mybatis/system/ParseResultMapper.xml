@@ -1,35 +1,99 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
-PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.project.system.result.mapper.ParseResultMapper">
-    
+
     <resultMap type="ParseResult" id="ParseResultResult">
-        <result property="parseResultId"    column="parse_result_id"    />
-        <result property="resourceId"    column="resource_id"    />
-        <result property="resourceFileId"    column="resource_file_id"    />
-        <result property="parseConfigId"    column="parse_config_id"    />
-        <result property="result"    column="result"    />
-        <result property="createBy"    column="create_by"    />
-        <result property="createTime"    column="create_time"    />
-        <result property="updateBy"    column="update_by"    />
-        <result property="updateTime"    column="update_time"    />
-        <result property="remark"    column="remark"    />
+        <result property="parseResultId" column="parse_result_id"/>
+        <result property="resourceId" column="resource_id"/>
+        <result property="resourceFileId" column="resource_file_id"/>
+        <result property="parseConfigId" column="parse_config_id"/>
+        <result property="result" column="result"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="remark" column="remark"/>
     </resultMap>
 
     <sql id="selectParseResultVo">
-        select parse_result_id, resource_id, resource_file_id, parse_config_id, result, create_by, create_time, update_by, update_time, remark from parse_result
+        select parse_result_id,
+               resource_id,
+               resource_file_id,
+               parse_config_id,
+               result,
+               create_by,
+               create_time,
+               update_by,
+               update_time,
+               remark
+        from parse_result
     </sql>
 
-    <select id="selectParseResultList" parameterType="ParseResult" resultMap="ParseResultResult">
-        <include refid="selectParseResultVo"/>
-        <where>  
-            <if test="resourceId != null "> and resource_id = #{resourceId}</if>
-            <if test="resourceFileId != null "> and resource_file_id = #{resourceFileId}</if>
-            <if test="parseConfigId != null "> and parse_config_id = #{parseConfigId}</if>
+    <resultMap id="ParseResultResultDTO" type="ParseResultDTO">
+        <!-- 假设ParseResult是对应的Java类名 -->
+
+        <id property="parseResultId" column="parse_result_id"/>
+        <result property="resourceId" column="resource_id"/>
+        <result property="resourceFileId" column="resource_file_id"/>
+        <result property="parseConfigId" column="parse_config_id"/>
+        <result property="result" column="result"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="remark" column="remark"/>
+
+        <result property="resourceDesc" column="resource_desc"/>
+        <result property="fileName" column="file_name"/>
+        <result property="parseDesc" column="parse_desc"/>
+    </resultMap>
+    <select id="selectParseResultList" parameterType="ParseResult" resultMap="ParseResultResultDTO">
+        select
+        pr.parse_result_id,
+        pr.resource_id,
+        pr.resource_file_id,
+        pr.parse_config_id,
+        pr.result,
+        pr.create_by,
+        pr.create_time,
+        pr.update_by,
+        pr.update_time,
+        pr.remark,
+        rec.resource_desc,
+        prf.file_name,
+        pc.parse_desc
+        from parse_result pr inner join parse_config pc on pr.parse_config_id = pc.parse_config_id
+        inner join parse_resource rec on rec.resource_id = pr.resource_id
+        inner join parse_resource_file prf on prf.resource_file_id = pr.resource_file_id
+        <where>
+            <if test="resourceId != null ">and pr.resource_id = #{resourceId}</if>
+            <if test="resourceFileId != null ">and pr.resource_file_id = #{resourceFileId}</if>
+            <if test="parseConfigId != null ">and pr.parse_config_id = #{parseConfigId}</if>
         </where>
     </select>
-    
+
+    <select id="selectList" parameterType="ParseResult" resultMap="ParseResultResultDTO">
+        select
+        pr.parse_result_id,
+        pr.resource_id,
+        pr.source_file_id,
+        pr.parse_config_id,
+        pr.result,
+        pr.create_by,
+        pr.create_time,
+        pr.update_by,
+        pr.update_time,
+        pr.remark,
+        from parse_result pr
+        <where>
+            <if test="resourceId != null ">and resource_id = #{resourceId}</if>
+            <if test="resourceFileId != null ">and resource_file_id = #{resourceFileId}</if>
+            <if test="parseConfigId != null ">and parse_config_id = #{parseConfigId}</if>
+        </where>
+    </select>
+
     <select id="selectParseResultByParseResultId" parameterType="Long" resultMap="ParseResultResult">
         <include refid="selectParseResultVo"/>
         where parse_result_id = #{parseResultId}
@@ -47,7 +111,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="updateBy != null">update_by,</if>
             <if test="updateTime != null">update_time,</if>
             <if test="remark != null">remark,</if>
-         </trim>
+        </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="resourceId != null">#{resourceId},</if>
             <if test="resourceFileId != null">#{resourceFileId},</if>
@@ -58,7 +122,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="updateBy != null">#{updateBy},</if>
             <if test="updateTime != null">#{updateTime},</if>
             <if test="remark != null">#{remark},</if>
-         </trim>
+        </trim>
     </insert>
 
     <update id="updateParseResult" parameterType="ParseResult">
@@ -78,11 +142,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </update>
 
     <delete id="deleteParseResultByParseResultId" parameterType="Long">
-        delete from parse_result where parse_result_id = #{parseResultId}
+        delete
+        from parse_result
+        where parse_result_id = #{parseResultId}
     </delete>
 
     <delete id="deleteParseResultByParseResultIds" parameterType="String">
-        delete from parse_result where parse_result_id in 
+        delete from parse_result where parse_result_id in
         <foreach item="parseResultId" collection="array" open="(" separator="," close=")">
             #{parseResultId}
         </foreach>

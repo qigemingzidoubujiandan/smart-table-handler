@@ -6,6 +6,7 @@ import com.ruoyi.project.system.file.domain.ParseResourceFile;
 import com.ruoyi.project.system.file.service.IParseResourceFileService;
 import com.ruoyi.project.system.resource.domain.ParseResource;
 import com.ruoyi.project.system.resource.service.IParseResourceService;
+import com.ruoyi.project.system.result.domain.ParseResultDTO;
 import com.ruoyi.project.system.tableconfig.domain.ParseConfig;
 import com.ruoyi.project.system.tableconfig.service.IParseConfigService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -69,7 +70,7 @@ public class ParseResultController extends BaseController
     @ResponseBody
     public TableDataInfo list(ParseResult parseResult){
         startPage();
-        List<ParseResult> list = parseResultService.selectParseResultList(parseResult);
+        List<ParseResultDTO> list = parseResultService.selectParseResultList(parseResult);
         return getDataTable(list);
     }
 
@@ -82,7 +83,7 @@ public class ParseResultController extends BaseController
     @ResponseBody
     public AjaxResult export(ParseResult parseResult)
     {
-        List<ParseResult> list = parseResultService.selectParseResultList(parseResult);
+        List<ParseResult> list = parseResultService.selectList(parseResult);
         ExcelUtil<ParseResult> util = new ExcelUtil<ParseResult>(ParseResult.class);
         return util.exportExcel(list, "解析结果数据");
     }
