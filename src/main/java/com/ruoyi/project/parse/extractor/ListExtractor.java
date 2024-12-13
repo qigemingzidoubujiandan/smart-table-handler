@@ -58,14 +58,8 @@ public class ListExtractor extends AbstractTableExtractor<List<List<String>>> {
         this.setIsMergeRow(isMergeRow);
     }
 
-
     @Override
-    public List<List<String>> extract(List<Table> tables) {
-        doExtract(tables);
-        return getParsedResult();
-    }
-
-    void doExtract(List<? extends Table> unresolvedTables) {
+    void doExtract(List<Table> unresolvedTables) {
         this.unresolvedTables = unresolvedTables;
         if ("1".equals(isMergeRow)) {
             mergePDFRow(unresolvedTables);

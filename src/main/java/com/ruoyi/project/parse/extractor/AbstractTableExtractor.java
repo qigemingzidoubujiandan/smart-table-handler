@@ -48,6 +48,14 @@ public abstract class AbstractTableExtractor<T> implements IExtractor<List<Table
      */
     abstract void fillMatchedData(T t);
 
+    @Override
+    public T extract(List<Table> tables) {
+        doExtract(tables);
+        return parsedResult;
+    }
+
+    abstract void doExtract(List<Table> tables);
+
     /**
      * kv表格单位转换
      *

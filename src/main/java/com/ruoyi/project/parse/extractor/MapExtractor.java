@@ -53,12 +53,7 @@ public class MapExtractor extends AbstractTableExtractor<Map<String, String>> {
 
 
     @Override
-    public Map<String, String> extract(List<Table> tables) {
-        doExtract(tables);
-        return getParsedResult();
-    }
-
-    void doExtract(List<? extends Table> tables) {
+    void doExtract(List<Table> tables) {
         this.unresolvedTables = tables;
         extract_KV();
     }
