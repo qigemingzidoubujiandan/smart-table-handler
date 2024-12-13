@@ -5,7 +5,7 @@
 </head>
 <body class="white-bg">
     <div class="wrapper wrapper-content animated fadeInRight ibox-content">
-        <form class="form-horizontal m" id="form-recourse-add"  enctype="multipart/form-data">
+        <form class="form-horizontal m" id="form-resource-add"  enctype="multipart/form-data">
             <div class="col-xs-12">
                 <div class="form-group">
                     <label class="col-sm-3 control-label is-required">资源描述：</label>
@@ -35,7 +35,7 @@
     </div>
     <th:block th:include="include :: footer" />
     <script th:inline="javascript">
-        var prefix = ctx + "system/recourse";
+        var prefix = ctx + "system/resource";
 
         function submitHandler() {
             if ($.validate.form()) {
@@ -44,7 +44,7 @@
         }
 
         function uploadFile() {
-            var formData = new FormData($('#form-recourse-add')[0]); // 使用整个表单作为数据源
+            var formData = new FormData($('#form-resource-add')[0]); // 使用整个表单作为数据源
 
             $.ajax({
                 url: prefix + "/add",

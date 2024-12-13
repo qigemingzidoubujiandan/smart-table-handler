@@ -1,4 +1,4 @@
-package com.ruoyi.project.system.recourse.domain;
+package com.ruoyi.project.system.resource.domain;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
@@ -6,12 +6,12 @@ import com.ruoyi.framework.aspectj.lang.annotation.Excel;
 import com.ruoyi.framework.web.domain.BaseEntity;
 
 /**
- * 资源对象 parse_recourse
+ * 资源对象 parse_resource
  * 
  * @author ruoyi
  * @date 2024-12-10
  */
-public class ParseRecourse extends BaseEntity
+public class ParseResource extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
 

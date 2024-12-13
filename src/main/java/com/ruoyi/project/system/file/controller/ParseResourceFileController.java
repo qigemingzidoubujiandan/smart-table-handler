@@ -2,9 +2,9 @@ package com.ruoyi.project.system.file.controller;
 
 import java.util.List;
 
-import com.ruoyi.project.system.file.domain.ParseRecourseFileDTO;
-import com.ruoyi.project.system.recourse.domain.ParseRecourse;
-import com.ruoyi.project.system.recourse.service.IParseRecourseService;
+import com.ruoyi.project.system.file.domain.ParseResourceFileDTO;
+import com.ruoyi.project.system.resource.domain.ParseResource;
+import com.ruoyi.project.system.resource.service.IParseResourceService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import com.ruoyi.framework.aspectj.lang.annotation.Log;
 import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
-import com.ruoyi.project.system.file.domain.ParseRecourseFile;
-import com.ruoyi.project.system.file.service.IParseRecourseFileService;
+import com.ruoyi.project.system.file.domain.ParseResourceFile;
+import com.ruoyi.project.system.file.service.IParseResourceFileService;
 import com.ruoyi.framework.web.controller.BaseController;
 import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.common.utils.poi.ExcelUtil;
@@ -31,21 +31,21 @@ import com.ruoyi.framework.web.page.TableDataInfo;
  */
 @Controller
 @RequestMapping("/system/file")
-public class ParseRecourseFileController extends BaseController
+public class ParseResourceFileController extends BaseController
 {
     private String prefix = "system/file";
 
     @Autowired
-    private IParseRecourseFileService parseRecourseFileService;
+    private IParseResourceFileService parseResourceFileService;
 
     @Autowired
-    private IParseRecourseService parseRecourseService;
+    private IParseResourceService parseResourceService;
 
     @RequiresPermissions("system:file:view")
     @GetMapping()
     public String file( ModelMap mmap)
     {
-        mmap.put("resources", parseRecourseService.selectParseRecourseList(new ParseRecourse()));
+        mmap.put("resources", parseResourceService.selectParseResourceList(new ParseResource()));
         startPage();
         return prefix + "/file";
     }
@@ -56,10 +56,10 @@ public class ParseRecourseFileController extends BaseController
     @RequiresPermissions("system:file:list")
     @PostMapping("/list")
     @ResponseBody
-    public TableDataInfo list(ParseRecourseFileDTO parseRecourseFile)
+    public TableDataInfo list(ParseResourceFileDTO parseResourceFile)
     {
         startPage();
-        List<ParseRecourseFileDTO> list = parseRecourseFileService.selectParseRecourseFileList(parseRecourseFile);
+        List<ParseResourceFileDTO> list = parseResourceFileService.selectParseResourceFileList(parseResourceFile);
         return getDataTable(list);
     }
 
@@ -70,10 +70,10 @@ public class ParseRecourseFileController extends BaseController
     @Log(title = "文件资源", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     @ResponseBody
-    public AjaxResult export(ParseRecourseFile parseRecourseFile)
+    public AjaxResult export(ParseResourceFile parseResourceFile)
     {
-        List<ParseRecourseFile> list = parseRecourseFileService.selectList(parseRecourseFile);
-        ExcelUtil<ParseRecourseFile> util = new ExcelUtil<ParseRecourseFile>(ParseRecourseFile.class);
+        List<ParseResourceFile> list = parseResourceFileService.selectList(parseResourceFile);
+        ExcelUtil<ParseResourceFile> util = new ExcelUtil<ParseResourceFile>(ParseResourceFile.class);
         return util.exportExcel(list, "文件资源数据");
     }
 
@@ -93,20 +93,20 @@ public class ParseRecourseFileController extends BaseController
     @Log(title = "文件资源", businessType = BusinessType.INSERT)
     @PostMapping("/add")
     @ResponseBody
-    public AjaxResult addSave(ParseRecourseFile parseRecourseFile)
+    public AjaxResult addSave(ParseResourceFile parseResourceFile)
     {
-        return toAjax(parseRecourseFileService.insertParseRecourseFile(parseRecourseFile));
+        return toAjax(parseResourceFileService.insertParseResourceFile(parseResourceFile));
     }
 
     /**
      * 修改文件资源
      */
     @RequiresPermissions("system:file:edit")
-    @GetMapping("/edit/{recourseFileId}")
-    public String edit(@PathVariable("recourseFileId") Long recourseFileId, ModelMap mmap)
+    @GetMapping("/edit/{resourceFileId}")
+    public String edit(@PathVariable("resourceFileId") Long resourceFileId, ModelMap mmap)
     {
-        ParseRecourseFile parseRecourseFile = parseRecourseFileService.selectParseRecourseFileByRecourseFileId(recourseFileId);
-        mmap.put("parseRecourseFile", parseRecourseFile);
+        ParseResourceFile parseResourceFile = parseResourceFileService.selectParseResourceFileByResourceFileId(resourceFileId);
+        mmap.put("parseResourceFile", parseResourceFile);
         return prefix + "/edit";
     }
 
@@ -117,9 +117,9 @@ public class ParseRecourseFileController extends BaseController
     @Log(title = "文件资源", businessType = BusinessType.UPDATE)
     @PostMapping("/edit")
     @ResponseBody
-    public AjaxResult editSave(ParseRecourseFile parseRecourseFile)
+    public AjaxResult editSave(ParseResourceFile parseResourceFile)
     {
-        return toAjax(parseRecourseFileService.updateParseRecourseFile(parseRecourseFile));
+        return toAjax(parseResourceFileService.updateParseResourceFile(parseResourceFile));
     }
 
     /**
@@ -131,6 +131,6 @@ public class ParseRecourseFileController extends BaseController
     @ResponseBody
     public AjaxResult remove(String ids)
     {
-        return toAjax(parseRecourseFileService.deleteParseRecourseFileByRecourseFileIds(ids));
+        return toAjax(parseResourceFileService.deleteParseResourceFileByResourceFileIds(ids));
     }
 }

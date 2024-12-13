@@ -2,9 +2,9 @@
 <!DOCTYPE mapper
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.ruoyi.project.system.recourse.mapper.ParseRecourseMapper">
+<mapper namespace="com.ruoyi.project.system.resource.mapper.ParseResourceMapper">
     
-    <resultMap type="ParseRecourse" id="ParseRecourseResult">
+    <resultMap type="ParseResource" id="ParseResourceResult">
         <result property="resourceId"    column="resource_id"    />
         <result property="resourceDesc"    column="resource_desc"    />
         <result property="isParsed"    column="is_parsed"    />
@@ -16,25 +16,25 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="remark"    column="remark"    />
     </resultMap>
 
-    <sql id="selectParseRecourseVo">
-        select resource_id, resource_desc, is_parsed, location, create_by, create_time, update_by, update_time, remark from parse_recourse
+    <sql id="selectParseResourceVo">
+        select resource_id, resource_desc, is_parsed, location, create_by, create_time, update_by, update_time, remark from parse_resource
     </sql>
 
-    <select id="selectParseRecourseList" parameterType="ParseRecourse" resultMap="ParseRecourseResult">
-        <include refid="selectParseRecourseVo"/>
+    <select id="selectParseResourceList" parameterType="ParseResource" resultMap="ParseResourceResult">
+        <include refid="selectParseResourceVo"/>
         <where>  
             <if test="resourceDesc != null  and resourceDesc != ''"> and resource_desc like concat('%', #{resourceDesc}, '%')</if>
             <if test="isParsed != null "> and is_parsed = #{isParsed}</if>
         </where>
     </select>
     
-    <select id="selectParseRecourseByResourceId" parameterType="Long" resultMap="ParseRecourseResult">
-        <include refid="selectParseRecourseVo"/>
+    <select id="selectParseResourceByResourceId" parameterType="Long" resultMap="ParseResourceResult">
+        <include refid="selectParseResourceVo"/>
         where resource_id = #{resourceId}
     </select>
 
-    <insert id="insertParseRecourse" parameterType="ParseRecourse" useGeneratedKeys="true" keyProperty="resourceId">
-        insert into parse_recourse
+    <insert id="insertParseResource" parameterType="ParseResource" useGeneratedKeys="true" keyProperty="resourceId">
+        insert into parse_resource
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="resourceDesc != null and resourceDesc != ''">resource_desc,</if>
             <if test="isParsed != null">is_parsed,</if>
@@ -57,8 +57,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
          </trim>
     </insert>
 
-    <update id="updateParseRecourse" parameterType="ParseRecourse">
-        update parse_recourse
+    <update id="updateParseResource" parameterType="ParseResource">
+        update parse_resource
         <trim prefix="SET" suffixOverrides=",">
             <if test="resourceDesc != null and resourceDesc != ''">resource_desc = #{resourceDesc},</if>
             <if test="isParsed != null">is_parsed = #{isParsed},</if>
@@ -72,12 +72,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where resource_id = #{resourceId}
     </update>
 
-    <delete id="deleteParseRecourseByResourceId" parameterType="Long">
-        delete from parse_recourse where resource_id = #{resourceId}
+    <delete id="deleteParseResourceByResourceId" parameterType="Long">
+        delete from parse_resource where resource_id = #{resourceId}
     </delete>
 
-    <delete id="deleteParseRecourseByResourceIds" parameterType="String">
-        delete from parse_recourse where resource_id in 
+    <delete id="deleteParseResourceByResourceIds" parameterType="String">
+        delete from parse_resource where resource_id in
         <foreach item="resourceId" collection="array" open="(" separator="," close=")">
             #{resourceId}
         </foreach>

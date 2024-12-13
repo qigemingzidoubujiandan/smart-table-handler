@@ -2,10 +2,10 @@
 <!DOCTYPE mapper
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.ruoyi.project.system.file.mapper.ParseRecourseFileMapper">
+<mapper namespace="com.ruoyi.project.system.file.mapper.ParseResourceFileMapper">
     
-    <resultMap type="ParseRecourseFile" id="ParseRecourseFileResult">
-        <result property="recourseFileId"    column="recourse_file_id"    />
+    <resultMap type="ParseResourceFile" id="ParseResourceFileResult">
+        <result property="resourceFileId"    column="resource_file_id"    />
         <result property="resourceId"    column="resource_id"    />
         <result property="fileName"    column="file_name"    />
         <result property="fileType"    column="file_type"    />
@@ -18,11 +18,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="remark"    column="remark"    />
     </resultMap>
 
-    <sql id="selectParseRecourseFileVo">
-        select recourse_file_id, resource_id, file_name, file_type, location, is_parsed, create_by, create_time, update_by, update_time, remark from parse_recourse_file
+    <sql id="selectParseResourceFileVo">
+        select resource_file_id, resource_id, file_name, file_type, location, is_parsed, create_by, create_time, update_by, update_time, remark from parse_resource_file
     </sql>
-    <resultMap id="parseRecourseFileResultMap" type="ParseRecourseFileDTO">
-        <id column="recourse_file_id" property="recourseFileId" />
+    <resultMap id="parseResourceFileResultMap" type="ParseResourceFileDTO">
+        <id column="resource_file_id" property="resourceFileId" />
         <result column="resource_desc" property="resourceDesc" />
         <result column="resource_id" property="resourceId" />
         <result column="file_name" property="fileName" />
@@ -35,8 +35,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result column="update_time" property="updateTime" />
         <result column="remark" property="remark" />
     </resultMap>
-    <select id="selectParseRecourseFileList" parameterType="ParseRecourseFileDTO" resultMap="parseRecourseFileResultMap">
-        select f.recourse_file_id,
+    <select id="selectParseResourceFileList" parameterType="ParseResourceFileDTO" resultMap="parseResourceFileResultMap">
+        select f.resource_file_id,
                r.resource_desc,
                f.resource_id,
                f.file_name,
@@ -47,17 +47,18 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                f.create_time,
                f.update_by,
                f.update_time,
-               f.remark from parse_recourse_file f inner join parse_recourse r on f.resource_id = r.resource_id
+               f.remark from parse_resource_file f inner join parse_resource r on f.resource_id = r.resource_id
 
-        <where>  
+        <where>
+            <if test="resourceId != null "> and f.resource_id = #{resourceId}</if>
             <if test="fileName != null  and fileName != ''"> and f.file_name like concat('%', #{fileName}, '%')</if>
-            <if test="resourceDesc != null  and resourceDesc != ''"> and r.resource_desc like concat('%', #{resourceDesc}, '%')</if>
+<!--            <if test="resourceDesc != null  and resourceDesc != ''"> and r.resource_desc like concat('%', #{resourceDesc}, '%')</if>-->
             <if test="isParsed != null "> and f.is_parsed = #{isParsed}</if>
         </where>
     </select>
 
-    <select id="selectList" parameterType="ParseRecourseFileDTO" resultMap="ParseRecourseFileResult">
-        <include refid="selectParseRecourseFileVo"/>
+    <select id="selectList" parameterType="ParseResourceFileDTO" resultMap="ParseResourceFileResult">
+        <include refid="selectParseResourceFileVo"/>
         <where>
             <if test="resourceId != null "> and resource_id = #{resourceId}</if>
             <if test="fileName != null  and fileName != ''"> and file_name like concat('%', #{fileName}, '%')</if>
@@ -65,13 +66,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </where>
     </select>
     
-    <select id="selectParseRecourseFileByRecourseFileId" parameterType="Long" resultMap="ParseRecourseFileResult">
-        <include refid="selectParseRecourseFileVo"/>
-        where recourse_file_id = #{recourseFileId}
+    <select id="selectParseResourceFileByResourceFileId" parameterType="Long" resultMap="ParseResourceFileResult">
+        <include refid="selectParseResourceFileVo"/>
+        where resource_file_id = #{resourceFileId}
     </select>
 
-    <insert id="insertParseRecourseFile" parameterType="ParseRecourseFile" useGeneratedKeys="true" keyProperty="recourseFileId">
-        insert into parse_recourse_file
+    <insert id="insertParseResourceFile" parameterType="ParseResourceFile" useGeneratedKeys="true" keyProperty="resourceFileId">
+        insert into parse_resource_file
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="resourceId != null">resource_id,</if>
             <if test="fileName != null and fileName != ''">file_name,</if>
@@ -98,8 +99,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
          </trim>
     </insert>
 
-    <update id="updateParseRecourseFile" parameterType="ParseRecourseFile">
-        update parse_recourse_file
+    <update id="updateParseResourceFile" parameterType="ParseResourceFile">
+        update parse_resource_file
         <trim prefix="SET" suffixOverrides=",">
             <if test="resourceId != null">resource_id = #{resourceId},</if>
             <if test="fileName != null and fileName != ''">file_name = #{fileName},</if>
@@ -112,17 +113,17 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="updateTime != null">update_time = #{updateTime},</if>
             <if test="remark != null">remark = #{remark},</if>
         </trim>
-        where recourse_file_id = #{recourseFileId}
+        where resource_file_id = #{resourceFileId}
     </update>
 
-    <delete id="deleteParseRecourseFileByRecourseFileId" parameterType="Long">
-        delete from parse_recourse_file where recourse_file_id = #{recourseFileId}
+    <delete id="deleteParseResourceFileByResourceFileId" parameterType="Long">
+        delete from parse_resource_file where resource_file_id = #{resourceFileId}
     </delete>
 
-    <delete id="deleteParseRecourseFileByRecourseFileIds" parameterType="String">
-        delete from parse_recourse_file where recourse_file_id in 
-        <foreach item="recourseFileId" collection="array" open="(" separator="," close=")">
-            #{recourseFileId}
+    <delete id="deleteParseResourceFileByResourceFileIds" parameterType="String">
+        delete from parse_resource_file where resource_file_id in
+        <foreach item="resourceFileId" collection="array" open="(" separator="," close=")">
+            #{resourceFileId}
         </foreach>
     </delete>
 

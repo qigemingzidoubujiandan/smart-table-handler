@@ -1,4 +1,4 @@
-package com.ruoyi.project.system.recourse.controller;
+package com.ruoyi.project.system.resource.controller;
 
 import java.io.IOException;
 import java.util.List;
@@ -13,8 +13,8 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import com.ruoyi.framework.aspectj.lang.annotation.Log;
 import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
-import com.ruoyi.project.system.recourse.domain.ParseRecourse;
-import com.ruoyi.project.system.recourse.service.IParseRecourseService;
+import com.ruoyi.project.system.resource.domain.ParseResource;
+import com.ruoyi.project.system.resource.service.IParseResourceService;
 import com.ruoyi.framework.web.controller.BaseController;
 import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.common.utils.poi.ExcelUtil;
@@ -28,18 +28,18 @@ import org.springframework.web.multipart.MultipartFile;
  * @date 2024-12-10
  */
 @Controller
-@RequestMapping("/system/recourse")
-public class ParseRecourseController extends BaseController {
-    private String prefix = "system/recourse";
+@RequestMapping("/system/resource")
+public class ParseResourceController extends BaseController {
+    private String prefix = "system/resource";
 
     @Autowired
-    private IParseRecourseService parseRecourseService;
+    private IParseResourceService parseResourceService;
     @Autowired
     private ServerConfig serverConfig;
 
     @GetMapping()
-    public String recourse() {
-        return prefix + "/recourse";
+    public String resource() {
+        return prefix + "/resource";
     }
 
     /**
@@ -47,9 +47,9 @@ public class ParseRecourseController extends BaseController {
      */
     @PostMapping("/list")
     @ResponseBody
-    public TableDataInfo list(ParseRecourse parseRecourse) {
+    public TableDataInfo list(ParseResource parseResource) {
         startPage();
-        List<ParseRecourse> list = parseRecourseService.selectParseRecourseList(parseRecourse);
+        List<ParseResource> list = parseResourceService.selectParseResourceList(parseResource);
         return getDataTable(list);
     }
 
@@ -59,9 +59,9 @@ public class ParseRecourseController extends BaseController {
     @Log(title = "资源", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     @ResponseBody
-    public AjaxResult export(ParseRecourse parseRecourse) {
-        List<ParseRecourse> list = parseRecourseService.selectParseRecourseList(parseRecourse);
-        ExcelUtil<ParseRecourse> util = new ExcelUtil<ParseRecourse>(ParseRecourse.class);
+    public AjaxResult export(ParseResource parseResource) {
+        List<ParseResource> list = parseResourceService.selectParseResourceList(parseResource);
+        ExcelUtil<ParseResource> util = new ExcelUtil<ParseResource>(ParseResource.class);
         return util.exportExcel(list, "资源数据");
     }
 
@@ -88,12 +88,12 @@ public class ParseRecourseController extends BaseController {
         String upload = FileUploadUtils.upload(filePath, file);
         upload = upload.replaceAll("/profile", "");
         // 构建资源对象并保存到数据库
-        ParseRecourse parseRecourse = new ParseRecourse();
-        parseRecourse.setResourceDesc(resourceDesc);
-        parseRecourse.setRemark(remark);
-        parseRecourse.setLocation(upload);
+        ParseResource parseResource = new ParseResource();
+        parseResource.setResourceDesc(resourceDesc);
+        parseResource.setRemark(remark);
+        parseResource.setLocation(upload);
 
-        return toAjax(parseRecourseService.insertParseRecourse(parseRecourse, upload));
+        return toAjax(parseResourceService.insertParseResource(parseResource, upload));
     }
 
     /**
@@ -103,15 +103,15 @@ public class ParseRecourseController extends BaseController {
     @PostMapping("/parse/{resourceId}")
     @ResponseBody
     public AjaxResult parse(@PathVariable("resourceId")Long resourceId) {
-        return toAjax(parseRecourseService.parseResource(resourceId));
+        return toAjax(parseResourceService.parseResource(resourceId));
     }
     /**
      * 修改资源
      */
     @GetMapping("/edit/{resourceId}")
     public String edit(@PathVariable("resourceId") Long resourceId, ModelMap mmap) {
-        ParseRecourse parseRecourse = parseRecourseService.selectParseRecourseByResourceId(resourceId);
-        mmap.put("parseRecourse", parseRecourse);
+        ParseResource parseResource = parseResourceService.selectParseResourceByResourceId(resourceId);
+        mmap.put("parseResource", parseResource);
         return prefix + "/edit";
     }
 
@@ -121,8 +121,8 @@ public class ParseRecourseController extends BaseController {
     @Log(title = "资源", businessType = BusinessType.UPDATE)
     @PostMapping("/edit")
     @ResponseBody
-    public AjaxResult editSave(ParseRecourse parseRecourse) {
-        return toAjax(parseRecourseService.updateParseRecourse(parseRecourse));
+    public AjaxResult editSave(ParseResource parseResource) {
+        return toAjax(parseResourceService.updateParseResource(parseResource));
     }
 
     /**
@@ -132,6 +132,6 @@ public class ParseRecourseController extends BaseController {
     @PostMapping("/remove")
     @ResponseBody
     public AjaxResult remove(String ids) {
-        return toAjax(parseRecourseService.deleteParseRecourseByResourceIds(ids));
+        return toAjax(parseResourceService.deleteParseResourceByResourceIds(ids));
     }
 }

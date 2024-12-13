@@ -21,7 +21,7 @@
                 <div class="form-group">
                     <label class="col-sm-3 control-label is-required">解析描述：</label>
                     <div class="col-sm-8">
-                        <intput name="parseDesc" class="form-control" required>[[*{parseDesc}]]</intput>
+                            <input name="tableExpectationRow" th:field="*{parseDesc}" class="form-control" type="text" required>
                     </div>
                 </div>
             </div>
@@ -60,6 +60,28 @@
             </div>
             <div class="col-xs-12">
                 <div class="form-group">
+                    <label class="col-sm-3 control-label">合并跨页引起的行分割：</label>
+                    <div class="col-sm-8">
+                        <div class="radio-box" th:each="dict : ${@dict.getType('yes_or_no')}">
+                            <input type="radio" th:id="${'tableMatchMethod_' + dict.dictCode}" name="tableIsMergeRow" th:value="${dict.dictValue}" th:checked="${dict.default}">
+                            <label th:for="${'tableIsMergeRow_' + dict.dictCode}" th:text="${dict.dictLabel}"></label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">合并相同标题表格：</label>
+                    <div class="col-sm-8">
+                        <div class="radio-box" th:each="dict : ${@dict.getType('yes_or_no')}">
+                            <input type="radio" th:id="${'tableIsMergeSameTitle_' + dict.dictCode}" name="tableIsMergeSameTitle" th:value="${dict.dictValue}" th:checked="${dict.default}">
+                            <label th:for="${'tableIsMergeSameTitle_' + dict.dictCode}" th:text="${dict.dictLabel}"></label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12">
+                <div class="form-group">
                     <label class="col-sm-3 control-label is-required">解析条件：</label>
                     <div class="col-sm-8">
                         <textarea name="tableConditions" class="form-control" required>[[*{tableConditions}]]</textarea>
@@ -76,22 +98,6 @@
             </div>
             <div class="col-xs-12">
                 <div class="form-group">
-                    <label class="col-sm-3 control-label">合并相同标题表格：</label>
-                    <div class="col-sm-8">
-                        <input name="tableIsMergeSameTitle" th:field="*{tableIsMergeSameTitle}" class="form-control" type="text">
-                    </div>
-                </div>
-            </div>
-            <div class="col-xs-12">
-                <div class="form-group">
-                    <label class="col-sm-3 control-label">合并表格行：</label>
-                    <div class="col-sm-8">
-                        <input name="tableIsMergeRow" th:field="*{tableIsMergeRow}" class="form-control" type="text">
-                    </div>
-                </div>
-            </div>
-            <div class="col-xs-12">
-                <div class="form-group">
                     <label class="col-sm-3 control-label">中断表格：</label>
                     <div class="col-sm-8">
                         <textarea name="tableInterpretConditions" class="form-control">[[*{tableInterpretConditions}]]</textarea>
@@ -102,7 +108,8 @@
                 <div class="form-group">
                     <label class="col-sm-3 control-label">文本:正则表达式：</label>
                     <div class="col-sm-8">
-                        <textarea name="textRegExpression" class="form-control">[[*{textRegExpression}]]</textarea>
+                        <textarea name="textRegExpression" class="form-control" th:text="*{textRegExpression}" required></textarea>
+                        <span id="regex-error-message" style="color: red; display: none;">正则表达式有误，请检查。</span>
                     </div>
                 </div>
             </div>
@@ -144,15 +151,52 @@
             }
         }
 
+        // $("#form-tableconfig-edit").validate({
+        //     focusCleanup: true
+        // });
         $("#form-tableconfig-edit").validate({
-            focusCleanup: true
+            focusCleanup: true,
+            rules: {
+                textRegExpression: {
+                    required: true,
+                    regexValidation: true
+                }
+            },
+            messages: {
+                textRegExpression: {
+                    required: "请输入正则表达式。",
+                    regexValidation: "正则表达式有误，请检查。"
+                }
+            }
         });
 
+        // 添加自定义验证方法用于正则表达式检查
+        $.validator.addMethod("regexValidation", function(value, element) {
+            try {
+                new RegExp(value);
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }, "正则表达式有误，请检查。");
+
         function submitHandler() {
-            if ($.validate.form()) {
+            if ($("#form-tableconfig-edit").valid()) {
                 $.operate.save(prefix + "/edit", $('#form-tableconfig-edit').serialize());
             }
         }
+
+        // 实时反馈正则表达式的合法性
+        $('#textRegExpression').on('input', function() {
+            var regexInput = $(this).val();
+            var errorMessage = $('#regex-error-message');
+            try {
+                new RegExp(regexInput);
+                errorMessage.hide(); // 隐藏错误信息
+            } catch (e) {
+                errorMessage.show().text('正则表达式有误：' + e.message); // 显示错误信息
+            }
+        });
     </script>
 </body>
 </html>

@@ -10,17 +10,36 @@
                 <form id="formId">
                     <div class="select-list">
                         <ul>
+<!--                            <li>-->
+<!--                                <label>资源id：</label>-->
+<!--                                <input type="text" name="resourceId"/>-->
+<!--                            </li>-->
                             <li>
-                                <label>资源id：</label>
-                                <input type="text" name="resourceId"/>
+                                <label>所属资源：</label>
+                                <div class="col-sm-8">
+                                    <select id="resourceId" name="resourceId" class="form-control select2-multiple">
+                                        <option value="">所有</option>
+                                        <option th:each="post:${resources}" th:value="${post.resourceId}"  th:text="${post.resourceDesc}"></option>
+                                    </select>
+                                </div>
                             </li>
                             <li>
-                                <label>资源文件id：</label>
-                                <input type="text" name="recourseFileId"/>
+                                <label>所属文件：</label>
+                                <div class="col-sm-8">
+                                    <select id="resourceFileId" name="resourceFileId" class="form-control select2-multiple">
+                                        <option value="">所有</option>
+                                        <option th:each="post:${resourceFiles}" th:value="${post.resourceFileId}"  th:text="${post.fileName}"></option>
+                                    </select>
+                                </div>
                             </li>
                             <li>
-                                <label>配置id：</label>
-                                <input type="text" name="parseConfigId"/>
+                                <label>所属配置：</label>
+                                <div class="col-sm-8">
+                                    <select id="parseConfigId" name="parseConfigId" class="form-control select2-multiple">
+                                        <option value="">所有</option>
+                                        <option th:each="post:${parseConfigs}" th:value="${post.parseConfigId}"  th:text="${post.parseDesc}"></option>
+                                    </select>
+                                </div>
                             </li>
                             <li>
                                 <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
@@ -77,7 +96,7 @@
                     title: '资源id'
                 },
                 {
-                    field: 'recourseFileId',
+                    field: 'resourceFileId',
                     title: '资源文件id'
                 },
                 {

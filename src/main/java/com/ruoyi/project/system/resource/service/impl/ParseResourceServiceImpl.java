@@ -1,4 +1,4 @@
-package com.ruoyi.project.system.recourse.service.impl;
+package com.ruoyi.project.system.resource.service.impl;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,8 +23,8 @@ import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.file.FileTypeUtils;
 import com.ruoyi.framework.config.RuoYiConfig;
-import com.ruoyi.project.system.file.domain.ParseRecourseFile;
-import com.ruoyi.project.system.file.mapper.ParseRecourseFileMapper;
+import com.ruoyi.project.system.file.domain.ParseResourceFile;
+import com.ruoyi.project.system.file.mapper.ParseResourceFileMapper;
 import com.ruoyi.project.system.result.domain.ParseResult;
 import com.ruoyi.project.system.result.mapper.ParseResultMapper;
 import com.ruoyi.project.system.tableconfig.domain.ParseConfig;
@@ -37,9 +37,9 @@ import com.ruoyi.project.tool.parse.parser.ParserFactory;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.ruoyi.project.system.recourse.mapper.ParseRecourseMapper;
-import com.ruoyi.project.system.recourse.domain.ParseRecourse;
-import com.ruoyi.project.system.recourse.service.IParseRecourseService;
+import com.ruoyi.project.system.resource.mapper.ParseResourceMapper;
+import com.ruoyi.project.system.resource.domain.ParseResource;
+import com.ruoyi.project.system.resource.service.IParseResourceService;
 import com.ruoyi.common.utils.text.Convert;
 
 import static com.ruoyi.common.constant.FileConstants.SUPPORT_FILE_SUFFIX;
@@ -51,12 +51,12 @@ import static com.ruoyi.common.constant.FileConstants.SUPPORT_FILE_SUFFIX;
  * @date 2024-12-10
  */
 @Service
-public class ParseRecourseServiceImpl implements IParseRecourseService {
+public class ParseResourceServiceImpl implements IParseResourceService {
     @Autowired
-    private ParseRecourseMapper parseRecourseMapper;
+    private ParseResourceMapper parseResourceMapper;
 
     @Autowired
-    private ParseRecourseFileMapper parseRecourseFileMapper;
+    private ParseResourceFileMapper parseResourceFileMapper;
 
     @Autowired
     private ParseConfigMapper parseConfigMapper;
@@ -71,43 +71,43 @@ public class ParseRecourseServiceImpl implements IParseRecourseService {
      * @return 资源
      */
     @Override
-    public ParseRecourse selectParseRecourseByResourceId(Long resourceId) {
-        return parseRecourseMapper.selectParseRecourseByResourceId(resourceId);
+    public ParseResource selectParseResourceByResourceId(Long resourceId) {
+        return parseResourceMapper.selectParseResourceByResourceId(resourceId);
     }
 
     /**
      * 查询资源列表
      *
-     * @param parseRecourse 资源
+     * @param parseResource 资源
      * @return 资源
      */
     @Override
-    public List<ParseRecourse> selectParseRecourseList(ParseRecourse parseRecourse) {
-        return parseRecourseMapper.selectParseRecourseList(parseRecourse);
+    public List<ParseResource> selectParseResourceList(ParseResource parseResource) {
+        return parseResourceMapper.selectParseResourceList(parseResource);
     }
 
     /**
      * 新增资源
      *
-     * @param parseRecourse 资源
+     * @param parseResource 资源
      * @return 结果
      */
     @Override
-    public int insertParseRecourse(ParseRecourse parseRecourse, String packagefileName) {
-        int i = parseRecourseMapper.insertParseRecourse(parseRecourse);
-        parseRecourse.setCreateTime(DateUtils.getNowDate());
+    public int insertParseResource(ParseResource parseResource, String packagefileName) {
+        int i = parseResourceMapper.insertParseResource(parseResource);
+        parseResource.setCreateTime(DateUtils.getNowDate());
         // 本地资源路径
         List<String> files = obtainFile(RuoYiConfig.getProfile() + packagefileName);
-        List<ParseRecourseFile> list = Lists.newArrayList();
+        List<ParseResourceFile> list = Lists.newArrayList();
         files.forEach(file -> {
-            ParseRecourseFile recourseFile = new ParseRecourseFile();
-            recourseFile.setResourceId(parseRecourse.getResourceId());
-            recourseFile.setFileName(file);
-            recourseFile.setFileType(FileTypeUtils.getFileType(file));
-            recourseFile.setLocation(file);
-            recourseFile.setIsParsed(0L);
-            list.add(recourseFile);
-            parseRecourseFileMapper.insertParseRecourseFile(recourseFile);
+            ParseResourceFile resourceFile = new ParseResourceFile();
+            resourceFile.setResourceId(parseResource.getResourceId());
+            resourceFile.setFileName(file);
+            resourceFile.setFileType(FileTypeUtils.getFileType(file));
+            resourceFile.setLocation(file);
+            resourceFile.setIsParsed(0L);
+            list.add(resourceFile);
+            parseResourceFileMapper.insertParseResourceFile(resourceFile);
         });
         return i;
     }
@@ -146,13 +146,13 @@ public class ParseRecourseServiceImpl implements IParseRecourseService {
     /**
      * 修改资源
      *
-     * @param parseRecourse 资源
+     * @param parseResource 资源
      * @return 结果
      */
     @Override
-    public int updateParseRecourse(ParseRecourse parseRecourse) {
-        parseRecourse.setUpdateTime(DateUtils.getNowDate());
-        return parseRecourseMapper.updateParseRecourse(parseRecourse);
+    public int updateParseResource(ParseResource parseResource) {
+        parseResource.setUpdateTime(DateUtils.getNowDate());
+        return parseResourceMapper.updateParseResource(parseResource);
     }
 
     /**
@@ -162,8 +162,8 @@ public class ParseRecourseServiceImpl implements IParseRecourseService {
      * @return 结果
      */
     @Override
-    public int deleteParseRecourseByResourceIds(String resourceIds) {
-        return parseRecourseMapper.deleteParseRecourseByResourceIds(Convert.toStrArray(resourceIds));
+    public int deleteParseResourceByResourceIds(String resourceIds) {
+        return parseResourceMapper.deleteParseResourceByResourceIds(Convert.toStrArray(resourceIds));
     }
 
     /**
@@ -173,40 +173,40 @@ public class ParseRecourseServiceImpl implements IParseRecourseService {
      * @return 结果
      */
     @Override
-    public int deleteParseRecourseByResourceId(Long resourceId) {
-        return parseRecourseMapper.deleteParseRecourseByResourceId(resourceId);
+    public int deleteParseResourceByResourceId(Long resourceId) {
+        return parseResourceMapper.deleteParseResourceByResourceId(resourceId);
     }
 
     /**
      * 解析资源
      *
-     * @param recourseId 资源主键
+     * @param resourceId 资源主键
      */
     @Override
-    public int parseResource(Long recourseId) {
-        ParseRecourse parseRecourse = parseRecourseMapper.selectParseRecourseByResourceId(recourseId);
+    public int parseResource(Long resourceId) {
+        ParseResource parseResource = parseResourceMapper.selectParseResourceByResourceId(resourceId);
         // 先删除之前解析结果
-        clearPrevResult(parseRecourse.getResourceId());
+        clearPrevResult(parseResource.getResourceId());
         // 进行解析
-        parse(parseRecourse);
-        parseRecourse.setIsParsed(Long.parseLong(Constants.YES));
-        parseRecourse.setUpdateTime(DateUtils.getNowDate());
-        return parseRecourseMapper.updateParseRecourse(parseRecourse);
+        parse(parseResource);
+        parseResource.setIsParsed(Long.parseLong(Constants.YES));
+        parseResource.setUpdateTime(DateUtils.getNowDate());
+        return parseResourceMapper.updateParseResource(parseResource);
     }
 
-    public void clearPrevResult(Long recourseId) {
-        ParseRecourseFile parseRecourseFile = new ParseRecourseFile();
-        parseRecourseFile.setResourceId(recourseId);
-        List<ParseRecourseFile> parseRecourseFiles = parseRecourseFileMapper.selectList(parseRecourseFile);
+    public void clearPrevResult(Long resourceId) {
+        ParseResourceFile parseResourceFile = new ParseResourceFile();
+        parseResourceFile.setResourceId(resourceId);
+        List<ParseResourceFile> parseResourceFiles = parseResourceFileMapper.selectList(parseResourceFile);
 
         ParseResult parseResult = new ParseResult();
-        parseResult.setResourceId(recourseId);
+        parseResult.setResourceId(resourceId);
         List<ParseResult> parseResults = parseResultMapper.selectParseResultList(parseResult);
 
 //        // 删除文件资源
-//        String[] fileIdArr = parseRecourseFiles.stream().map(ParseRecourseFile::getRecourseFileId).map(String::valueOf).toArray(String[]::new);
+//        String[] fileIdArr = parseResourceFiles.stream().map(ParseResourceFile::getResourceFileId).map(String::valueOf).toArray(String[]::new);
 //        if (fileIdArr.length > 0) {
-//            parseRecourseFileMapper.deleteParseRecourseFileByRecourseFileIds(fileIdArr);
+//            parseResourceFileMapper.deleteParseResourceFileByResourceFileIds(fileIdArr);
 //        }
 
         // 删除解析结果
@@ -217,8 +217,8 @@ public class ParseRecourseServiceImpl implements IParseRecourseService {
     }
 
 
-    public void parse(ParseRecourse parseRecourse) {
-//        String location = parseRecourse.getLocation();
+    public void parse(ParseResource parseResource) {
+//        String location = parseResource.getLocation();
 //        // 创建 File 对象
 //        File directory = new File(location);
 //        // 检查目录是否存在
@@ -232,10 +232,10 @@ public class ParseRecourseServiceImpl implements IParseRecourseService {
 //            throw new ServiceException("目录为空: " + location);
 //        }
         // 获得所有子资源
-        Long resourceId = parseRecourse.getResourceId();
-        ParseRecourseFile parseRecourseFile = new ParseRecourseFile();
-        parseRecourseFile.setResourceId(resourceId);
-        List<ParseRecourseFile> parseRecourseFiles = parseRecourseFileMapper.selectList(parseRecourseFile);
+        Long resourceId = parseResource.getResourceId();
+        ParseResourceFile parseResourceFile = new ParseResourceFile();
+        parseResourceFile.setResourceId(resourceId);
+        List<ParseResourceFile> parseResourceFiles = parseResourceFileMapper.selectList(parseResourceFile);
 
         // 根据文件资源 获取对应的解析配置
         ParseConfig parseConfigReq = new ParseConfig();
@@ -245,15 +245,15 @@ public class ParseRecourseServiceImpl implements IParseRecourseService {
             throw new ServiceException("未配置解析规则");
         }
         // 遍历文件和子目录
-        parseRecourseFiles.forEach(r -> doParse(r, parseConfigList));
+        parseResourceFiles.forEach(r -> doParse(r, parseConfigList));
     }
 
-    public void doParse(ParseRecourseFile parseRecourseFile, List<ParseConfig> parseConfigList) {
-        String filePath = parseRecourseFile.getLocation();
+    public void doParse(ParseResourceFile parseResourceFile, List<ParseConfig> parseConfigList) {
+        String filePath = parseResourceFile.getLocation();
         for (ParseConfig parseConfig : parseConfigList) {
             // 1.获取解析器->解析
             ParseTypeEnum parseTypeEnum = ParseTypeEnum.get(parseConfig.getConfigType().intValue());
-            IParser iParser = ParserFactory.createParserByFilePath(parseRecourseFile.getLocation(), parseTypeEnum);
+            IParser iParser = ParserFactory.createParserByFilePath(parseResourceFile.getLocation(), parseTypeEnum);
             Object parsed = iParser.parse(filePath);
 
             // 2.获取抽取器->抽取
@@ -263,21 +263,21 @@ public class ParseRecourseServiceImpl implements IParseRecourseService {
             String key = pair.getKey();
             IExtractor<?, ?> extractor = pair.getValue();
             Object result = ((IExtractor<Object, ?>) extractor).extract(parsed);
-            parseResult(parseRecourseFile, parseConfig, result);
+            parseResult(parseResourceFile, parseConfig, result);
         }
-        parseRecourseFile.setIsParsed(Long.parseLong(Constants.YES));
-        parseRecourseFile.setUpdateTime(DateUtils.getNowDate());
-        parseRecourseFileMapper.updateParseRecourseFile(parseRecourseFile);
+        parseResourceFile.setIsParsed(Long.parseLong(Constants.YES));
+        parseResourceFile.setUpdateTime(DateUtils.getNowDate());
+        parseResourceFileMapper.updateParseResourceFile(parseResourceFile);
     }
 
-    public void parseResult(ParseRecourseFile parseRecourseFile, ParseConfig parseConfig, Object parseResult) {
-        System.out.println(parseRecourseFile);
+    public void parseResult(ParseResourceFile parseResourceFile, ParseConfig parseConfig, Object parseResult) {
+        System.out.println(parseResourceFile);
         System.out.println(parseConfig);
         System.out.println(parseResult);
         ParseResult result = new ParseResult();
         result.setResourceId(parseConfig.getResourceId());
         result.setParseConfigId(parseConfig.getParseConfigId());
-        result.setRecourseFileId(parseRecourseFile.getRecourseFileId());
+        result.setResourceFileId(parseResourceFile.getResourceFileId());
         if (Objects.nonNull(parseResult)) {
             result.setResult(JSONUtil.toJsonStr(parseResult));
         }

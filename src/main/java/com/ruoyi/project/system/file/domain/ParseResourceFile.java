@@ -6,17 +6,17 @@ import com.ruoyi.framework.aspectj.lang.annotation.Excel;
 import com.ruoyi.framework.web.domain.BaseEntity;
 
 /**
- * 文件资源对象 parse_recourse_file
+ * 文件资源对象 parse_resource_file
  * 
  * @author zhaochenliang
  * @date 2024-12-10
  */
-public class ParseRecourseFile extends BaseEntity
+public class ParseResourceFile extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
 
     /** 资源文件id */
-    private Long recourseFileId;
+    private Long resourceFileId;
 
     /** 资源id */
     @Excel(name = "资源id")
@@ -38,14 +38,14 @@ public class ParseRecourseFile extends BaseEntity
     @Excel(name = "是否解析")
     private Long isParsed;
 
-    public void setRecourseFileId(Long recourseFileId) 
+    public void setResourceFileId(Long resourceFileId) 
     {
-        this.recourseFileId = recourseFileId;
+        this.resourceFileId = resourceFileId;
     }
 
-    public Long getRecourseFileId() 
+    public Long getResourceFileId() 
     {
-        return recourseFileId;
+        return resourceFileId;
     }
 
     public void setResourceId(Long resourceId) 
@@ -101,7 +101,7 @@ public class ParseRecourseFile extends BaseEntity
     @Override
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
-            .append("recourseFileId", getRecourseFileId())
+            .append("resourceFileId", getResourceFileId())
             .append("resourceId", getResourceId())
             .append("fileName", getFileName())
             .append("fileType", getFileType())

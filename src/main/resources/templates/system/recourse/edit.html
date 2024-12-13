@@ -5,7 +5,7 @@
 </head>
 <body class="white-bg">
     <div class="wrapper wrapper-content animated fadeInRight ibox-content">
-        <form class="form-horizontal m" id="form-recourse-edit" th:object="${parseRecourse}">
+        <form class="form-horizontal m" id="form-resource-edit" th:object="${parseResource}">
             <input name="resourceId" th:field="*{resourceId}" type="hidden">
             <div class="col-xs-12">
                 <div class="form-group">
@@ -35,14 +35,14 @@
     </div>
     <th:block th:include="include :: footer" />
     <script th:inline="javascript">
-        var prefix = ctx + "system/recourse";
-        $("#form-recourse-edit").validate({
+        var prefix = ctx + "system/resource";
+        $("#form-resource-edit").validate({
             focusCleanup: true
         });
 
         function submitHandler() {
             if ($.validate.form()) {
-                $.operate.save(prefix + "/edit", $('#form-recourse-edit').serialize());
+                $.operate.save(prefix + "/edit", $('#form-resource-edit').serialize());
             }
         }
     </script>

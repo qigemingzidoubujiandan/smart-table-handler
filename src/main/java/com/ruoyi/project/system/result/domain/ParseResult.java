@@ -24,7 +24,7 @@ public class ParseResult extends BaseEntity
 
     /** 资源文件id */
     @Excel(name = "资源文件id")
-    private Long recourseFileId;
+    private Long resourceFileId;
 
     /** 配置id */
     @Excel(name = "配置id")
@@ -54,14 +54,14 @@ public class ParseResult extends BaseEntity
         return resourceId;
     }
 
-    public void setRecourseFileId(Long recourseFileId) 
+    public void setResourceFileId(Long resourceFileId) 
     {
-        this.recourseFileId = recourseFileId;
+        this.resourceFileId = resourceFileId;
     }
 
-    public Long getRecourseFileId() 
+    public Long getResourceFileId() 
     {
-        return recourseFileId;
+        return resourceFileId;
     }
 
     public void setParseConfigId(Long parseConfigId) 
@@ -89,7 +89,7 @@ public class ParseResult extends BaseEntity
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
             .append("parseResultId", getParseResultId())
             .append("resourceId", getResourceId())
-            .append("recourseFileId", getRecourseFileId())
+            .append("resourceFileId", getResourceFileId())
             .append("parseConfigId", getParseConfigId())
             .append("result", getResult())
             .append("createBy", getCreateBy())

@@ -7,7 +7,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <resultMap type="ParseResult" id="ParseResultResult">
         <result property="parseResultId"    column="parse_result_id"    />
         <result property="resourceId"    column="resource_id"    />
-        <result property="recourseFileId"    column="recourse_file_id"    />
+        <result property="resourceFileId"    column="resource_file_id"    />
         <result property="parseConfigId"    column="parse_config_id"    />
         <result property="result"    column="result"    />
         <result property="createBy"    column="create_by"    />
@@ -18,14 +18,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectParseResultVo">
-        select parse_result_id, resource_id, recourse_file_id, parse_config_id, result, create_by, create_time, update_by, update_time, remark from parse_result
+        select parse_result_id, resource_id, resource_file_id, parse_config_id, result, create_by, create_time, update_by, update_time, remark from parse_result
     </sql>
 
     <select id="selectParseResultList" parameterType="ParseResult" resultMap="ParseResultResult">
         <include refid="selectParseResultVo"/>
         <where>  
             <if test="resourceId != null "> and resource_id = #{resourceId}</if>
-            <if test="recourseFileId != null "> and recourse_file_id = #{recourseFileId}</if>
+            <if test="resourceFileId != null "> and resource_file_id = #{resourceFileId}</if>
             <if test="parseConfigId != null "> and parse_config_id = #{parseConfigId}</if>
         </where>
     </select>
@@ -39,7 +39,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         insert into parse_result
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="resourceId != null">resource_id,</if>
-            <if test="recourseFileId != null">recourse_file_id,</if>
+            <if test="resourceFileId != null">resource_file_id,</if>
             <if test="parseConfigId != null">parse_config_id,</if>
             <if test="result != null and result != ''">result,</if>
             <if test="createBy != null">create_by,</if>
@@ -50,7 +50,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="resourceId != null">#{resourceId},</if>
-            <if test="recourseFileId != null">#{recourseFileId},</if>
+            <if test="resourceFileId != null">#{resourceFileId},</if>
             <if test="parseConfigId != null">#{parseConfigId},</if>
             <if test="result != null and result != ''">#{result},</if>
             <if test="createBy != null">#{createBy},</if>
@@ -65,7 +65,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         update parse_result
         <trim prefix="SET" suffixOverrides=",">
             <if test="resourceId != null">resource_id = #{resourceId},</if>
-            <if test="recourseFileId != null">recourse_file_id = #{recourseFileId},</if>
+            <if test="resourceFileId != null">resource_file_id = #{resourceFileId},</if>
             <if test="parseConfigId != null">parse_config_id = #{parseConfigId},</if>
             <if test="result != null and result != ''">result = #{result},</if>
             <if test="createBy != null">create_by = #{createBy},</if>

@@ -2,8 +2,8 @@ package com.ruoyi.project.system.tableconfig.controller;
 
 import java.util.List;
 
-import com.ruoyi.project.system.recourse.domain.ParseRecourse;
-import com.ruoyi.project.system.recourse.service.IParseRecourseService;
+import com.ruoyi.project.system.resource.domain.ParseResource;
+import com.ruoyi.project.system.resource.service.IParseResourceService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -37,7 +37,7 @@ public class ParseConfigController extends BaseController {
     private IParseConfigService parseConfigService;
 
     @Autowired
-    private IParseRecourseService parseRecourseService;
+    private IParseResourceService parseResourceService;
 
     @RequiresPermissions("system:tableconfig:view")
     @GetMapping()
@@ -75,7 +75,7 @@ public class ParseConfigController extends BaseController {
      */
     @GetMapping("/add")
     public String add(ModelMap mmap) {
-        mmap.put("resources", parseRecourseService.selectParseRecourseList(new ParseRecourse()));  //这里key是需要待会和前端对应的，稍后会备注，value就是我查询到的一个结果
+        mmap.put("resources", parseResourceService.selectParseResourceList(new ParseResource()));  //这里key是需要待会和前端对应的，稍后会备注，value就是我查询到的一个结果
         return prefix + "/add";
     }
 
@@ -99,7 +99,7 @@ public class ParseConfigController extends BaseController {
         ParseConfig parseConfig = parseConfigService.selectParseConfigByParseConfigId(parseConfigId);
         mmap.put("parseConfig", parseConfig);
 
-        mmap.put("resources", parseRecourseService.selectParseRecourseList(new ParseRecourse()));  //这里key是需要待会和前端对应的，稍后会备注，value就是我查询到的一个结果
+        mmap.put("resources", parseResourceService.selectParseResourceList(new ParseResource()));  //这里key是需要待会和前端对应的，稍后会备注，value就是我查询到的一个结果
         mmap.put("defaultResourceId", parseConfig.getResourceId());
         return prefix + "/edit";
     }

@@ -1,6 +1,13 @@
 package com.ruoyi.project.system.result.controller;
 
 import java.util.List;
+
+import com.ruoyi.project.system.file.domain.ParseResourceFile;
+import com.ruoyi.project.system.file.service.IParseResourceFileService;
+import com.ruoyi.project.system.resource.domain.ParseResource;
+import com.ruoyi.project.system.resource.service.IParseResourceService;
+import com.ruoyi.project.system.tableconfig.domain.ParseConfig;
+import com.ruoyi.project.system.tableconfig.service.IParseConfigService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -34,10 +41,23 @@ public class ParseResultController extends BaseController
     @Autowired
     private IParseResultService parseResultService;
 
+    @Autowired
+    private IParseConfigService parseConfigService;
+
+    @Autowired
+    private IParseResourceService parseResourceService;
+
+    @Autowired
+    private IParseResourceFileService  parseResourceFileService;
+
     @RequiresPermissions("system:result:view")
     @GetMapping()
-    public String result()
+    public String result( ModelMap mmap)
     {
+        mmap.put("parseConfigs", parseConfigService.selectParseConfigList(new ParseConfig()));
+        mmap.put("resources", parseResourceService.selectParseResourceList(new ParseResource()));  //这里key是需要待会和前端对应的，稍后会备注，value就是我查询到的一个结果
+        mmap.put("resourceFiles", parseResourceFileService.selectList(new ParseResourceFile()));  //这里key是需要待会和前端对应的，稍后会备注，value就是我查询到的一个结果
+
         return prefix + "/result";
     }
 
@@ -47,8 +67,7 @@ public class ParseResultController extends BaseController
     @RequiresPermissions("system:result:list")
     @PostMapping("/list")
     @ResponseBody
-    public TableDataInfo list(ParseResult parseResult)
-    {
+    public TableDataInfo list(ParseResult parseResult){
         startPage();
         List<ParseResult> list = parseResultService.selectParseResultList(parseResult);
         return getDataTable(list);
