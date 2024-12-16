@@ -1,9 +1,18 @@
 package com.ruoyi.project.system.tableconfig.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import cn.hutool.core.collection.ListUtil;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONException;
 import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.common.utils.poi.ExcelUtil;
+import com.ruoyi.project.system.result.domain.ParseResult;
+import com.ruoyi.project.system.result.mapper.ParseResultMapper;
 import com.ruoyi.project.system.tableconfig.domain.ParseConfigDTO;
+import org.apache.commons.compress.utils.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.project.system.tableconfig.mapper.ParseConfigMapper;
@@ -21,6 +30,9 @@ import com.ruoyi.common.utils.text.Convert;
 public class ParseConfigServiceImpl implements IParseConfigService {
     @Autowired
     private ParseConfigMapper parseConfigMapper;
+
+    @Autowired
+    private ParseResultMapper parseResultMapper;
 
     /**
      * 查询解析配置
@@ -94,4 +106,52 @@ public class ParseConfigServiceImpl implements IParseConfigService {
     public int deleteParseConfigByParseConfigId(Long parseConfigId) {
         return parseConfigMapper.deleteParseConfigByParseConfigId(parseConfigId);
     }
+
+    public List<String> getTitles(Long parseConfigId) {
+        ParseConfig parseConfig = selectParseConfigByParseConfigId(parseConfigId);
+        return ListUtil.toList(parseConfig.getConditionArr());
+    }
+
+    public List<List<String>> getContent(Long parseConfigId) {
+        ParseResult parseResult = new ParseResult();
+        parseResult.setParseResultId(parseConfigId);
+        List<ParseResult> parseResults = parseResultMapper.selectList(parseResult);
+        List<List<String>> resultList = new ArrayList<>();
+        for (ParseResult result : parseResults) {
+            String resultResultStr = result.getResult();
+            try {
+                // 尝试将字符串解析为JSON数组
+                JSONArray jsonArray = JSON.parseArray(resultResultStr);
+                if (jsonArray != null && !jsonArray.isEmpty()) {
+                    // 如果成功解析且数组非空，则认为是表格数据
+                    List<List<String>> tableData = new ArrayList<>();
+                    boolean isFirstRow = true;
+                    for (Object rowObj : jsonArray) {
+                        JSONArray row = (JSONArray) rowObj;
+                        if (isFirstRow) {
+                            isFirstRow = false;
+                            continue; // 跳过标题行
+                        }
+                        List<String> rowData = new ArrayList<>();
+                        for (Object cell : row) {
+                            rowData.add(cell.toString());
+                        }
+                        tableData.add(rowData);
+                    }
+                    resultList.addAll(tableData);
+                } else {
+                    // 如果解析失败或为空，则认为是普通字符串
+                    resultList.add(ListUtil.of(resultResultStr));
+                }
+                return resultList;
+            } catch (JSONException e) {
+                // 如果解析失败或为空，则认为是普通字符串
+                List<List<String>> singleElementList = new ArrayList<>();
+                singleElementList.add(ListUtil.of(resultResultStr));
+                return singleElementList;
+            }
+        }
+        return resultList;
+    }
+
 }

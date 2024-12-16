@@ -161,3 +161,7 @@ gen:
       banner: false
       db-config:
         id-type: auto
+
+# application.properties
+spring-bootrun:
+  jvmArguments: --add-opens=java.base/java.lang=ALL-UNNAMED

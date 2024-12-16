@@ -61,4 +61,9 @@ public interface IParseConfigService
      * @return 结果
      */
     public int deleteParseConfigByParseConfigId(Long parseConfigId);
-}
+
+    public List<String> getTitles(Long parseConfigId);
+    public List<List<String>> getContent(Long parseConfigId);
+
+
+    }

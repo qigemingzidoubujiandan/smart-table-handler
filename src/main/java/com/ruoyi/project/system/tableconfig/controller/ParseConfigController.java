@@ -24,6 +24,8 @@ import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.framework.web.page.TableDataInfo;
 
+import javax.servlet.http.HttpServletResponse;
+
 /**
  * 解析配置Controller
  *
@@ -128,4 +130,5 @@ public class ParseConfigController extends BaseController {
     public AjaxResult remove(String ids) {
         return toAjax(parseConfigService.deleteParseConfigByParseConfigIds(ids));
     }
+
 }

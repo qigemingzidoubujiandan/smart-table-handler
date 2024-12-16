@@ -380,6 +380,7 @@ var table = {
                     var params = $("#" + table.options.id).bootstrapTable('getOptions');
                     var dataParam = $("#" + currentId).serializeArray();
                     dataParam.push({ "name": "orderByColumn", "value": params.sortName });
+                    debugger;
                     dataParam.push({ "name": "isAsc", "value": params.sortOrder });
                     $.modal.loading("正在导出数据，请稍候...");
                     $.post(table.options.exportUrl, dataParam, function(result) {

@@ -284,4 +284,5 @@ public class ParseResourceServiceImpl implements IParseResourceService {
         }
         parseResultMapper.insertParseResult(result);
     }
+
 }
