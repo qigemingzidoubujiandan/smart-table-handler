@@ -60,37 +60,46 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="updateTime"    column="update_time"    />
         <result property="remark"    column="remark"    />
         <result property="resourceDesc"    column="resource_desc"    />
+        <result property="resultCount"    column="result_count"    />
     </resultMap>
     <select id="selectParseConfigList" parameterType="ParseConfig" resultMap="ParseConfigDTO">
-        select
-            pc.parse_config_id,
-            pc.resource_id,
-            pc.parse_desc,
-            pc.config_type,
-            pc.table_type,
-            pc.table_match_method,
-            pc.table_parser_type,
-            pc.table_conditions,
-            pc.table_expectation_row,
-            pc.table_is_merge_same_title,
-            pc.table_is_merge_row,
-            pc.table_interpret_conditions,
-            pc.text_reg_expression,
-            pc.create_by,
-            pc.create_time,
-            pc.update_by,
-            pc.update_time,
-            pc.remark,
-            pr.resource_desc
-        from parse_config pc inner join parse_resource pr on  pc.resource_id = pr.resource_id
+        SELECT
+        pc.parse_config_id,
+        pc.resource_id,
+        pc.parse_desc,
+        pc.config_type,
+        pc.table_type,
+        pc.table_match_method,
+        pc.table_parser_type,
+        pc.table_conditions,
+        pc.table_expectation_row,
+        pc.table_is_merge_same_title,
+        pc.table_is_merge_row,
+        pc.table_interpret_conditions,
+        pc.text_reg_expression,
+        pc.create_by,
+        pc.create_time,
+        pc.update_by,
+        pc.update_time,
+        pc.remark,
+        pr.resource_desc,
+        (
+        SELECT COUNT(*)
+        FROM parse_result re
+        WHERE re.parse_config_id = pc.parse_config_id
+        ) AS result_count
+        FROM parse_config pc
+        INNER JOIN parse_resource pr ON pc.resource_id = pr.resource_id
         <where>
-            <if test="resourceId != null "> and pc.resource_id = #{resourceId}</if>
-            <if test="parseDesc != null  and parseDesc != ''"> and pc.parse_desc = #{parseDesc}</if>
-            <if test="configType != null "> and pc.config_type = #{configType}</if>
-            <if test="textRegExpression != null  and textRegExpression != ''"> and pc.text_reg_expression = #{textRegExpression}</if>
+            <if test="resourceId != null ">and pc.resource_id = #{resourceId}</if>
+            <if test="parseDesc != null  and parseDesc != ''">and pc.parse_desc = #{parseDesc}</if>
+            <if test="configType != null ">and pc.config_type = #{configType}</if>
+            <if test="textRegExpression != null  and textRegExpression != ''">and pc.text_reg_expression =
+                #{textRegExpression}
+            </if>
         </where>
     </select>
-    
+
     <select id="selectParseConfigByParseConfigId" parameterType="Long" resultMap="ParseConfigResult">
         <include refid="selectParseConfigVo"/>
         where parse_config_id = #{parseConfigId}

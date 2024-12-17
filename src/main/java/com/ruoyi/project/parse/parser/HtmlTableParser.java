@@ -4,29 +4,38 @@ package com.ruoyi.project.parse.parser;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import com.google.common.collect.Lists;
+import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.project.parse.domain.Cell;
 import com.ruoyi.project.parse.domain.DefaultCell;
 import com.ruoyi.project.parse.domain.HtmlTable;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @SuppressWarnings({"rawtypes"})
 @Slf4j
 @AllArgsConstructor
-public class HtmlTableParser extends AbstractTableParser<Document> {
+public class HtmlTableParser extends AbstractTableParser<String> {
 
     /**
      * 解析pdf，返回pdf表格数据
      */
     @Override
-    public List<HtmlTable> parse(Document dataSource) {
-        return dataSource != null ? table(dataSource) : ListUtil.empty();
+    public List<HtmlTable> parse(String dataSource) {
+        try {
+            Document document = Jsoup.parse(new File(dataSource), "UTF-8");
+            return table(document);
+        } catch (IOException e) {
+            throw new ServiceException("解析失败");
+        }
     }
 
     /**

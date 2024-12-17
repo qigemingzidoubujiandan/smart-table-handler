@@ -9,5 +9,7 @@ import lombok.Data;
 @Data
 public class ParseConfigDTO extends ParseConfig{
     private String resourceDesc;
+
+    private int resultCount;
 }
 

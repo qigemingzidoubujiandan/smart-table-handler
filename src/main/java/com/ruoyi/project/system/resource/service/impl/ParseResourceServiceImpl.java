@@ -35,6 +35,7 @@ import com.ruoyi.project.parse.extractor.ExtractorConvertor;
 import com.ruoyi.project.parse.extractor.IExtractor;
 import com.ruoyi.project.parse.parser.IParser;
 import com.ruoyi.project.parse.parser.ParserFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -52,6 +53,7 @@ import static com.ruoyi.common.constant.FileConstants.SUPPORT_FILE_SUFFIX;
  * @date 2024-12-10
  */
 @Service
+@Slf4j
 public class ParseResourceServiceImpl implements IParseResourceService {
     @Autowired
     private ParseResourceMapper parseResourceMapper;
@@ -272,9 +274,7 @@ public class ParseResourceServiceImpl implements IParseResourceService {
     }
 
     public void parseResult(ParseResourceFile parseResourceFile, ParseConfig parseConfig, Object parseResult) {
-        System.out.println(parseResourceFile);
-        System.out.println(parseConfig);
-        System.out.println(parseResult);
+        log.info(String.valueOf(parseResult.toString()));
         ParseResult result = new ParseResult();
         result.setResourceId(parseConfig.getResourceId());
         result.setParseConfigId(parseConfig.getParseConfigId());

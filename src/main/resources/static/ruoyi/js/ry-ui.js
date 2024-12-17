@@ -380,10 +380,29 @@ var table = {
                     var params = $("#" + table.options.id).bootstrapTable('getOptions');
                     var dataParam = $("#" + currentId).serializeArray();
                     dataParam.push({ "name": "orderByColumn", "value": params.sortName });
-                    debugger;
                     dataParam.push({ "name": "isAsc", "value": params.sortOrder });
                     $.modal.loading("正在导出数据，请稍候...");
                     $.post(table.options.exportUrl, dataParam, function(result) {
+                        if (result.code == web_status.SUCCESS) {
+                            window.location.href = ctx + "common/download?fileName=" + encodeURI(result.msg) + "&delete=" + true;
+                        } else if (result.code == web_status.WARNING) {
+                            $.modal.alertWarning(result.msg)
+                        } else {
+                            $.modal.alertError(result.msg);
+                        }
+                        $.modal.closeLoading();
+                    });
+                });
+            },
+            // 导出数据
+            exportExcelById: function(id) {
+                table.set();
+                $.modal.confirm("确定导出" + table.options.modalName + "吗？", function() {
+                    if ($.common.isNotEmpty(id)) {
+                        table.options.exportUrl = table.options.exportUrl.replace("{id}", id);
+                    }
+                    $.modal.loading("正在导出数据，请稍候...");
+                    $.post(table.options.exportUrl, null, function(result) {
                         if (result.code == web_status.SUCCESS) {
                             window.location.href = ctx + "common/download?fileName=" + encodeURI(result.msg) + "&delete=" + true;
                         } else if (result.code == web_status.WARNING) {

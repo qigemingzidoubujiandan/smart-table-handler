@@ -1,12 +1,13 @@
 package com.ruoyi.project.system.tableconfig.service.impl;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONException;
+import com.alibaba.fastjson.JSONObject;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.project.system.result.domain.ParseResult;
@@ -107,14 +108,16 @@ public class ParseConfigServiceImpl implements IParseConfigService {
         return parseConfigMapper.deleteParseConfigByParseConfigId(parseConfigId);
     }
 
+    @Override
     public List<String> getTitles(Long parseConfigId) {
         ParseConfig parseConfig = selectParseConfigByParseConfigId(parseConfigId);
         return ListUtil.toList(parseConfig.getConditionArr());
     }
 
+    @Override
     public List<List<String>> getContent(Long parseConfigId) {
         ParseResult parseResult = new ParseResult();
-        parseResult.setParseResultId(parseConfigId);
+        parseResult.setParseConfigId(parseConfigId);
         List<ParseResult> parseResults = parseResultMapper.selectList(parseResult);
         List<List<String>> resultList = new ArrayList<>();
         for (ParseResult result : parseResults) {
@@ -140,18 +143,26 @@ public class ParseConfigServiceImpl implements IParseConfigService {
                     }
                     resultList.addAll(tableData);
                 } else {
-                    // 如果解析失败或为空，则认为是普通字符串
-                    resultList.add(ListUtil.of(resultResultStr));
+                    handleJsonObjectValues(resultResultStr, resultList);
                 }
-                return resultList;
             } catch (JSONException e) {
-                // 如果解析失败或为空，则认为是普通字符串
-                List<List<String>> singleElementList = new ArrayList<>();
-                singleElementList.add(ListUtil.of(resultResultStr));
-                return singleElementList;
+                handleJsonObjectValues(resultResultStr, resultList);
             }
         }
         return resultList;
     }
 
+    private void handleJsonObjectValues(String jsonString, List<List<String>> resultList) {
+        try {
+            JSONUtil.parse(jsonString);
+            // 先解析为JSONObject，再转换为Map以保持键值对的顺序
+            LinkedHashMap<String, String> map = JSONUtil.toBean(jsonString, LinkedHashMap.class);
+            Collection<String> values = map.values();
+            List<String> rowData = ListUtil.toList(values);
+            resultList.add(rowData);
+        } catch (JSONException e) {
+            // 如果解析失败，则认为是普通字符串
+            resultList.add(ListUtil.of(jsonString));
+        }
+    }
 }

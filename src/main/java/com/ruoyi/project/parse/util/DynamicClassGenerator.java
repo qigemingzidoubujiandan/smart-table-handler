@@ -5,6 +5,10 @@ import javassist.bytecode.AnnotationsAttribute;
 import javassist.bytecode.annotation.Annotation;
 import javassist.bytecode.annotation.StringMemberValue;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -26,6 +30,43 @@ public class DynamicClassGenerator {
         });
     }
 
+
+    public static List<Object> obtainDynamicObject(List<List<Object>> dataList, Class<?> dynamicClass) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, NoSuchFieldException {
+        // 实例化对象并填充数据
+        List<Object> entityList = new ArrayList<>();
+        for (List<Object> row : dataList) {
+            Object instance = dynamicClass.getDeclaredConstructor().newInstance();
+            for (int i = 0; i < row.size(); i++) {
+                String fieldName = "field" + i;
+                String methodName = "set" + Character.toUpperCase(fieldName.charAt(0)) + fieldName.substring(1);
+
+                Field field = dynamicClass.getDeclaredField(fieldName);
+                Class<?> paramType = field.getType();
+                Method method = dynamicClass.getMethod(methodName, paramType);
+
+                Object value = row.get(i);
+                if (!paramType.isInstance(value)) {
+                    if (paramType == Integer.class || paramType == int.class) {
+                        value = ((Number) value).intValue();
+                    } else if (paramType == String.class) {
+                        value = String.valueOf(value);
+                    }
+                }
+
+                method.invoke(instance, value);
+            }
+            entityList.add(instance);
+        }
+        List<Object> typedEntityList = new ArrayList<>();
+        for (Object obj : entityList) {
+            if (!dynamicClass.isInstance(obj)) {
+                throw new IllegalArgumentException("List contains elements not of type " + dynamicClass.getName());
+            }
+            typedEntityList.add(obj);
+        }
+        return typedEntityList;
+    }
+
     /**
      * 动态生成包含 @Excel 注解的类。
      *
@@ -41,7 +82,7 @@ public class DynamicClassGenerator {
         for (int i = 0; i < headers.size(); i++) {
             Map<String, Object> header = headers.get(i);
             String fieldName = "field" + i;
-            String typeName = (String) header.get("type"); // 假设类型是字符串形式，例如 "java.lang.String"
+            String typeName = (String) header.get("type");
             String excelName = (String) header.get("name");
 
             CtClass fieldType = pool.get(typeName);
