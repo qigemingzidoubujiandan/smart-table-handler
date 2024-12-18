@@ -18,7 +18,7 @@ import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.ruoyi.project.parse.convert.UnitExtractConverter.handleAmountUnit;
+import static com.ruoyi.project.parse.extractor.unit.UnitExtractConverter.handleAmountUnit;
 
 /**
  * list类的规则
@@ -34,41 +34,36 @@ import static com.ruoyi.project.parse.convert.UnitExtractConverter.handleAmountU
 @Data
 public class ListExtractor extends AbstractTableExtractor<TableExtractedResult> {
 
-    protected List<? extends Table> unresolvedTables;
-    protected String interpretConditions;
-    protected String isMergeSameTitle;
-    protected String isMergeRow;
-
-    public ListExtractor(String[] conditions, int expectParseRowSize, String interpretConditions, String isMergeRow, String isMergeSameTitle) {
-        this.setParsedResult(new TableExtractedResult(new ArrayList<>(8)));
-        this.setConditions(conditions);
-        this.setExpectParseRowSize(expectParseRowSize);
-        this.setInterpretConditions(interpretConditions);
-        this.setIsMergeSameTitle(isMergeSameTitle);
-        this.setIsMergeRow(isMergeRow);
+    public ListExtractor(ExtractorConfig config) {
+        super(config);
     }
 
     @Override
-    void doExtract(List<Table> unresolvedTables) {
-        this.unresolvedTables = unresolvedTables;
-        if ("1".equals(isMergeRow)) {
+    protected TableExtractedResult createParsedResult() {
+        return new TableExtractedResult(new ArrayList<>(8));
+    }
+
+    @Override
+    protected void doExtract(List<Table> unresolvedTables) {
+        if (config.isMergeRow()) {
             mergePDFRow(unresolvedTables);
         }
-        if ("1".equals(isMergeSameTitle)) {
+        if (config.isMergeSameTitle()) {
             mergeTableByThEqual(unresolvedTables);
         }
-        fuzzyMatchingExtractTable();
+        fuzzyMatchingExtractTable(unresolvedTables);
     }
 
     @Override
     public boolean parsed() {
-        return getParsedResult().getTableData().size() >= getExpectParseRowSize() && getExpectParseRowSize() > 0;
+        return getParsedResult().getTableData().size() >= config.getExpectParseRowSize() && config.getExpectParseRowSize() > 0;
     }
 
     @Override
     public void fillMatchedData(TableExtractedResult result) {
         getParsedResult().getTableData().addAll(result.getTableData());
     }
+
 
     /**
      * 模糊匹配抽取整个表格的内容信息
@@ -95,9 +90,9 @@ public class ListExtractor extends AbstractTableExtractor<TableExtractedResult> 
      * 表头模糊匹配
      * 如果是pdf抽取的，可能被分页割开，一直抽取到满足列数为止
      */
-    protected void fuzzyMatchingExtractTable() {
+    protected void fuzzyMatchingExtractTable(List<Table> tables) {
         try {
-            extractTable(true);
+            extractTable(tables, true);
         } catch (Exception e) {
             log.error("extractTable error : msg:{}", e.getMessage(), e);
         }
@@ -110,7 +105,7 @@ public class ListExtractor extends AbstractTableExtractor<TableExtractedResult> 
      */
     protected void fuzzyMatchingAnyThExtractTable(List<Table> pdfTables) {
         try {
-            extractAnyThTable();
+            extractAnyThTable(pdfTables);
         } catch (Exception e) {
             log.error("extractTable error : msg:{}", e.getMessage(), e);
         }
@@ -160,9 +155,9 @@ public class ListExtractor extends AbstractTableExtractor<TableExtractedResult> 
      * 表头全匹配
      * 如果是pdf抽取的，可能被分页割开，一直抽取到满足列数为止
      */
-    protected void exactMatchingExtractTable() {
+    protected void exactMatchingExtractTable(List<Table> tables) {
         try {
-            extractTable(false);
+            extractTable(tables, false);
         } catch (Exception e) {
             log.error("extractTable error : msg:{}", e.getMessage(), e);
         }
@@ -190,12 +185,12 @@ public class ListExtractor extends AbstractTableExtractor<TableExtractedResult> 
         // 去掉换行
         Object[] texts = thList.stream().map(Cell::text).map(format()).toArray();
         // 验证表格列数
-        if (texts.length != this.getConditions().length) {
+        if (texts.length != config.getConditions().length) {
             return ExtractRet.FAIL;
         }
         // 验证表头 -> 多页的表格第一次才验证
         if (isVerifyTableTitle) {
-            Object[] titles = Arrays.stream(this.getConditions()).map(String::trim).toArray();
+            Object[] titles = Arrays.stream(config.getConditions()).map(String::trim).toArray();
             for (int i = 0; i < texts.length; i++) {
                 if (thMatchPredicate.test(texts[i], titles[i])) {
                     return ExtractRet.FAIL;
@@ -251,11 +246,11 @@ public class ListExtractor extends AbstractTableExtractor<TableExtractedResult> 
             if (list.isEmpty() || list.get(0).isEmpty()) {
                 return false;
             }
-            if (StrUtil.isNotEmpty(interpretConditions)) {
+            if (StrUtil.isNotEmpty(config.getInterpretConditions())) {
                 for (List<Cell> cells : rows) {
                     for (Cell cell : cells) {
                         String text = cell.text();
-                        return text.contains(interpretConditions);
+                        return text.contains(config.getInterpretConditions());
                     }
                 }
             }
@@ -272,10 +267,10 @@ public class ListExtractor extends AbstractTableExtractor<TableExtractedResult> 
      * 抽取完整的表格的内容信息
      * 如果是pdf抽取的，可能被分页割开，一直抽取到满足列数为止
      */
-    protected void extractTable(boolean fuzzyMatching) {
+    protected void extractTable(List<Table> tables, boolean fuzzyMatching) {
         outer:
-        for (int i = 0; i < unresolvedTables.size(); i++) {
-            Table table = unresolvedTables.get(i);
+        for (int i = 0; i < tables.size(); i++) {
+            Table table = tables.get(i);
             // 抽取过的就不必再抽取了，这里只考虑数据被一个地方用
             if (table.isExtracted()) {
                 continue;
@@ -301,9 +296,9 @@ public class ListExtractor extends AbstractTableExtractor<TableExtractedResult> 
                 table.setExtracted(true);
             }
             // 如果表格类型是pdf,被分页切割了，需要继续进行抽取，重下一个、下下一个....表格进行抽取
-            while (Objects.equals(table.source(), FileTypeEnum.PDF) && i + 1 < unresolvedTables.size()
+            while (Objects.equals(table.source(), FileTypeEnum.PDF) && i + 1 < tables.size()
                     && result == ExtractRet.UNFINISHED) {
-                Table nextPDFTable = unresolvedTables.get(++i);
+                Table nextPDFTable = tables.get(++i);
                 if (fuzzyMatching) {
                     result = fuzzyMatchingExtractTableCell(nextPDFTable, thFunc, false);
                 } else {
@@ -334,10 +329,10 @@ public class ListExtractor extends AbstractTableExtractor<TableExtractedResult> 
      * ③ 序号、资产代码、资产名称、摊余成本、占基金比例
      * </p>
      */
-    protected void extractAnyThTable() {
+    protected void extractAnyThTable(List<Table> tables) {
         outer:
-        for (int i = 0; i < unresolvedTables.size(); i++) {
-            Table table = unresolvedTables.get(i);
+        for (int i = 0; i < tables.size(); i++) {
+            Table table = tables.get(i);
             // 抽取过的就不必再抽取了，这里只考虑数据被一个地方用
             if (table.isExtracted()) {
                 continue;
@@ -358,9 +353,9 @@ public class ListExtractor extends AbstractTableExtractor<TableExtractedResult> 
                 table.setExtracted(true);
             }
             // 如果表格类型是pdf,被分页切割了，需要继续进行抽取，重下一个、下下一个....表格进行抽取
-            while (Objects.equals(table.source(), FileTypeEnum.PDF) && i + 1 < unresolvedTables.size()
+            while (Objects.equals(table.source(), FileTypeEnum.PDF) && i + 1 < tables.size()
                     && result == ExtractRet.UNFINISHED) {
-                Table nextPDFTable = unresolvedTables.get(++i);
+                Table nextPDFTable = tables.get(++i);
                 result = fuzzyMatchingAnyThExtractTableCell(nextPDFTable, thFunc, false);
                 // 失败表示该表格未满足期望的条数，但是接下来的表格却因为 列不符合 等原因失败，说明该表格已经没有了后续，直接退出
                 if (result == ExtractRet.FAIL) {

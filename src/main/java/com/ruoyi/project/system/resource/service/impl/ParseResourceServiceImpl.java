@@ -24,12 +24,17 @@ import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.file.FileTypeUtils;
 import com.ruoyi.common.utils.file.FileUtils;
 import com.ruoyi.framework.config.RuoYiConfig;
+import com.ruoyi.project.parse.DocumentProcessor;
+import com.ruoyi.project.parse.domain.Table;
+import com.ruoyi.project.parse.extractor.ExtractorConfig;
 import com.ruoyi.project.parse.extractor.result.ExtractedResult;
 import com.ruoyi.project.parse.extractor.result.KVExtractedResult;
 import com.ruoyi.project.parse.extractor.result.TableExtractedResult;
 import com.ruoyi.project.parse.extractor.result.TextExtractedResult;
+import com.ruoyi.project.parse.filefetcher.FileFetcher;
 import com.ruoyi.project.system.file.domain.ParseResourceFile;
 import com.ruoyi.project.system.file.mapper.ParseResourceFileMapper;
+import com.ruoyi.project.system.resource.convert.ConfigConverter;
 import com.ruoyi.project.system.result.domain.ParseResult;
 import com.ruoyi.project.system.result.mapper.ParseResultMapper;
 import com.ruoyi.project.system.tableconfig.domain.ParseConfig;
@@ -258,59 +263,27 @@ public class ParseResourceServiceImpl implements IParseResourceService {
     public void doParse(ParseResourceFile parseResourceFile, List<ParseConfig> parseConfigList) {
         String filePath = parseResourceFile.getLocation();
         for (ParseConfig parseConfig : parseConfigList) {
-            // 1. 获取解析器 -> 解析
-            ParseTypeEnum parseTypeEnum = ParseTypeEnum.get(parseConfig.getConfigType().intValue());
-            IParser iParser = ParserFactory.createParserByFilePath(parseResourceFile.getLocation(), parseTypeEnum);
-            Object parsed = iParser.parse(filePath);
-
-            // 2. 获取抽取器 -> 抽取
-            Pair<String, ? extends IExtractor<?, ? extends ExtractedResult>> pair = ExtractorConvertor.createExtractor(parseConfig);
-
-            // 3. 对结果进行处理
-            String key = pair.getKey();
-            IExtractor<Object, ? extends ExtractedResult> extractor = (IExtractor<Object, ? extends ExtractedResult>) pair.getValue();
-            ExtractedResult result = extractor.extract(parsed);
-
-            // 4. 处理解析结果
-            parseResult(parseResourceFile, parseConfig, result);
+            FileFetcher fileFetcher = new FileFetcher() {
+                @Override
+                public List<String> fetchFiles() {
+                    return ListUtil.of(filePath);
+                }
+                @Override
+                public String fetchFile() {
+                    return filePath;
+                }
+            };
+            ExtractorConfig extractorConfig = ConfigConverter.convertToExtractorConfig(parseConfig);
+            List<ExtractedResult> extractedResults = DocumentProcessor.processFile(fileFetcher, extractorConfig);
+            for (ExtractedResult extractedResult : extractedResults) {
+                parseResult(parseResourceFile, parseConfig, extractedResult);
+            }
         }
         parseResourceFile.setIsParsed(Long.parseLong(Constants.YES));
         parseResourceFile.setUpdateTime(DateUtils.getNowDate());
         parseResourceFileMapper.updateParseResourceFile(parseResourceFile);
     }
 
-//    // 辅助方法：处理解析结果
-//    private void parseResult(ParseResourceFile parseResourceFile, ParseConfig parseConfig, ExtractedResult result) {
-//        switch (result.getType()) {
-//            case "TABLE":
-//                handleTableResult((TableExtractedResult) result);
-//                break;
-//            case "KEY_VALUE":
-//                handleKVResult((KVExtractedResult) result);
-//                break;
-//            case "TEXT":
-//                handleTextResult((TextExtractedResult) result);
-//                break;
-//            default:
-//                System.out.println("Unknown result type: " + result.getType());
-//        }
-//    }
-//
-//    // 具体的处理方法
-//    private void handleTableResult(TableExtractedResult result) {
-//        // 处理表格数据结果
-//        System.out.println("Handling table result: " + result.getTableData());
-//    }
-//
-//    private void handleKVResult(KVExtractedResult result) {
-//        // 处理键值对数据结果
-//        System.out.println("Handling key-value result: " + result.getKeyValuePairs());
-//    }
-//
-//    private void handleTextResult(TextExtractedResult result) {
-//        // 处理文本数据结果
-//        System.out.println("Handling text result: " + result.getText());
-//    }
     public void parseResult(ParseResourceFile parseResourceFile, ParseConfig parseConfig, Object parseResult) {
         log.info(String.valueOf(parseResult.toString()));
         ParseResult result = new ParseResult();

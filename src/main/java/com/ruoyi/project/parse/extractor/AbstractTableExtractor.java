@@ -2,7 +2,7 @@ package com.ruoyi.project.parse.extractor;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
-import com.ruoyi.project.parse.convert.UnitConvert;
+import com.ruoyi.project.parse.extractor.unit.UnitConvert;
 import com.ruoyi.project.parse.domain.Cell;
 import com.ruoyi.project.parse.domain.PDFTable;
 import com.ruoyi.project.parse.domain.Table;
@@ -16,8 +16,8 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.ruoyi.project.parse.convert.UnitExtractConverter.handleAmountUnit;
-import static com.ruoyi.project.parse.convert.UnitExtractor.amountUnitExtract;
+import static com.ruoyi.project.parse.extractor.unit.UnitExtractConverter.handleAmountUnit;
+import static com.ruoyi.project.parse.extractor.unit.UnitExtractor.amountUnitExtract;
 
 
 /**
@@ -27,26 +27,16 @@ import static com.ruoyi.project.parse.convert.UnitExtractor.amountUnitExtract;
 @Slf4j
 @Data
 public abstract class AbstractTableExtractor<T extends ExtractedResult> implements IExtractor<List<Table>, T> {
-    private T parsedResult;
 
-    private String[] conditions;
+    protected final ExtractorConfig config;
+    protected T parsedResult;
 
-    /**
-     * 期望解析的行数
-     * !!! pdf 因为分页割裂的表格,这个参数尤为重要,会解析到期望解析的行数
-     */
-    private int expectParseRowSize;
-
-    protected T matchedData() {
-        return parsedResult;
+    protected AbstractTableExtractor(ExtractorConfig config) {
+        this.config = config;
+        this.parsedResult = createParsedResult();
     }
 
-    abstract boolean parsed();
-
-    /**
-     * 解析后填充匹配的数据
-     */
-    abstract void fillMatchedData(T t);
+    protected abstract T createParsedResult();
 
     @Override
     public T extract(List<Table> tables) {
@@ -54,7 +44,15 @@ public abstract class AbstractTableExtractor<T extends ExtractedResult> implemen
         return parsedResult;
     }
 
-    abstract void doExtract(List<Table> tables);
+    protected abstract void doExtract(List<Table> tables);
+
+    protected T matchedData() {
+        return parsedResult;
+    }
+
+    public abstract boolean parsed();
+
+    public abstract void fillMatchedData(T t);
 
     /**
      * kv表格单位转换

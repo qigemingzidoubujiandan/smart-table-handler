@@ -16,7 +16,7 @@ import java.lang.reflect.Type;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
-import static com.ruoyi.project.parse.convert.UnitExtractConverter.handleAmountUnit;
+import static com.ruoyi.project.parse.extractor.unit.UnitExtractConverter.handleAmountUnit;
 
 
 @Slf4j

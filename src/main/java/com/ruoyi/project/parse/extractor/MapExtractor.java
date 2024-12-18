@@ -27,23 +27,24 @@ import java.util.Map;
  */
 @Slf4j
 public class MapExtractor extends AbstractTableExtractor<KVExtractedResult> {
-    protected List<? extends Table> unresolvedTables;
 
-    public MapExtractor(String[] conditions, int expectParseRowSize) {
-        this.setParsedResult(new KVExtractedResult(new HashMap<>()));
-        this.setConditions(conditions);
-        this.setExpectParseRowSize(expectParseRowSize);
+    public MapExtractor(ExtractorConfig config) {
+        super(config);
     }
 
-    public MapExtractor(String[] conditions) {
-        this.setParsedResult(new KVExtractedResult(new HashMap<>()));
-        this.setConditions(conditions);
-        this.setExpectParseRowSize(-1);
+    @Override
+    protected KVExtractedResult createParsedResult() {
+        return new KVExtractedResult(new HashMap<>());
+    }
+
+    @Override
+    protected void doExtract(List<Table> tables) {
+        extract_KV(tables);
     }
 
     @Override
     public boolean parsed() {
-        return getParsedResult().getKeyValuePairs().size() >= getExpectParseRowSize();
+        return getParsedResult().getKeyValuePairs().size() >= config.getExpectParseRowSize();
     }
 
     @Override
@@ -51,25 +52,19 @@ public class MapExtractor extends AbstractTableExtractor<KVExtractedResult> {
         getParsedResult().getKeyValuePairs().putAll(result.getKeyValuePairs());
     }
 
-    @Override
-    void doExtract(List<Table> tables) {
-        this.unresolvedTables = tables;
-        extract_KV();
-    }
-
     /**
      * 解析 k-v 形式 (也就是只包含两个表格的形式)
      */
-    protected void extract_KV() {
-        for (Table table : unresolvedTables) {
-            extract_KV(table.getData());
+    protected void extract_KV(List<Table> tables) {
+        for (Table table : tables) {
+            doExtract_KV(table.getData());
         }
     }
 
     /**
      * 解析 k-v 形式 (也就是只包含两个表格的形式)
      */
-    protected void extract_KV(List<List<Cell>> rows) {
+    protected void doExtract_KV(List<List<Cell>> rows) {
         if (CollUtil.isEmpty(rows)) {
             return;
         }
@@ -89,7 +84,7 @@ public class MapExtractor extends AbstractTableExtractor<KVExtractedResult> {
             return;
         }
         Cell cell = row.get(0);
-        String[] conditions = getConditions();
+        String[] conditions = config.getConditions();
         for (String condition : conditions) {
             String rowKey = TableUtil.format(cell.text());
             if (rowKey.contains(condition)) {

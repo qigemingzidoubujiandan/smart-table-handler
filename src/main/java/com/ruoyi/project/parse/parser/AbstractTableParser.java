@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
-import static com.ruoyi.project.parse.convert.UnitExtractor.amountUnitExtract;
+import static com.ruoyi.project.parse.extractor.unit.UnitExtractor.amountUnitExtract;
 
 public abstract class AbstractTableParser<T> implements IParser<T, List<? extends Table>> {
 

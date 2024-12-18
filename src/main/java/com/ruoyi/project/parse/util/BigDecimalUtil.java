@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Objects;
 
-import static com.ruoyi.project.parse.convert.UnitExtractConverter.isNumber;
+import static com.ruoyi.project.parse.extractor.unit.UnitExtractConverter.isNumber;
 
 @Slf4j
 public class BigDecimalUtil {

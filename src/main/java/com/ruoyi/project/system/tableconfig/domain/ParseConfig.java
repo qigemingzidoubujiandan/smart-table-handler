@@ -29,7 +29,7 @@ public class ParseConfig extends BaseEntity
 
     /** 解析类型 */
     @Excel(name = "解析类型")
-    private Long configType;
+    private Integer configType;
 
     /** 表格类型 */
     @Excel(name = "表格类型")
@@ -90,12 +90,12 @@ public class ParseConfig extends BaseEntity
         return parseDesc;
     }
 
-    public void setConfigType(Long configType) 
+    public void setConfigType(Integer configType)
     {
         this.configType = configType;
     }
 
-    public Long getConfigType() 
+    public Integer getConfigType()
     {
         return configType;
     }
