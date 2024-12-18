@@ -31,7 +31,7 @@ public class ParserFactory {
 
         // 注册多个解析器
         registerParser(FileTypeEnum.PDF, ParseTypeEnum.TABLE, TabulaPDFTableParser.class);
-        registerParser(FileTypeEnum.PDF, ParseTypeEnum.TABLE, PyPDFPlumberTableParser.class);
+//        registerParser(FileTypeEnum.PDF, ParseTypeEnum.TABLE, PyPDFPlumberTableParser.class);
     }
 
     /**

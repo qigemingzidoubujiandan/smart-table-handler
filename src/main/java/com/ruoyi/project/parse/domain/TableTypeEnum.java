@@ -1,19 +1,19 @@
 package com.ruoyi.project.parse.domain;
 
-public enum TableMatchMethodEnum {
+public enum TableTypeEnum {
     KV(1, "KV类型"),
     LIST(2, "列表");
 
     private final Integer code;
     private final String desc;
 
-    TableMatchMethodEnum(Integer code, String desc) {
+    TableTypeEnum(Integer code, String desc) {
         this.code = code;
         this.desc = desc;
     }
 
-    public static TableMatchMethodEnum get(Integer code) {
-        for (TableMatchMethodEnum item : TableMatchMethodEnum.values()) {
+    public static TableTypeEnum get(Integer code) {
+        for (TableTypeEnum item : TableTypeEnum.values()) {
             if (item.getCode().equals(code)) {
                 return item;
             }
@@ -21,8 +21,8 @@ public enum TableMatchMethodEnum {
         return null;
     }
 
-    public static TableMatchMethodEnum getByDesc(String desc) {
-        for (TableMatchMethodEnum item : TableMatchMethodEnum.values()) {
+    public static TableTypeEnum getByDesc(String desc) {
+        for (TableTypeEnum item : TableTypeEnum.values()) {
             if (item.getDesc().equals(desc)) {
                 return item;
             }
@@ -30,8 +30,8 @@ public enum TableMatchMethodEnum {
         return null;
     }
 
-    public static TableMatchMethodEnum fromCode(int code) {
-        for (TableMatchMethodEnum value : values()) {
+    public static TableTypeEnum fromCode(int code) {
+        for (TableTypeEnum value : values()) {
             if (value.getCode() == code) {
                 return value;
             }

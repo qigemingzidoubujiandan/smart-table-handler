@@ -4,6 +4,7 @@ import java.util.regex.Pattern;
 
 import com.ruoyi.common.utils.text.Convert;
 import com.ruoyi.project.parse.domain.ParseTypeEnum;
+import com.ruoyi.project.parse.domain.TableTypeEnum;
 import com.ruoyi.project.parse.extractor.ExtractorConfig;
 import com.ruoyi.project.system.tableconfig.domain.ParseConfig;
 
@@ -30,6 +31,7 @@ public class ConfigConverter {
 
         if (configType.equals(ParseTypeEnum.TABLE.getCode())) { // 表格配置
             return new ExtractorConfig(
+                    TableTypeEnum.get(parseConfig.getTableType()),
                     Convert.toStrArray(parseConfig.getTableConditions()),
                     parseConfig.getTableExpectationRow().intValue(),
                     parseConfig.getTableInterpretConditions(),

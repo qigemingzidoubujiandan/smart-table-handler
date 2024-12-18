@@ -33,11 +33,11 @@ public class ParseConfig extends BaseEntity
 
     /** 表格类型 */
     @Excel(name = "表格类型")
-    private Long tableType;
+    private Integer tableType;
 
     /** 匹配方式 */
     @Excel(name = "匹配方式")
-    private Long tableMatchMethod;
+    private Integer tableMatchMethod;
 
     /** 解析器类型 */
     private Long tableParserType;
@@ -100,22 +100,22 @@ public class ParseConfig extends BaseEntity
         return configType;
     }
 
-    public void setTableType(Long tableType) 
+    public void setTableType(Integer tableType)
     {
         this.tableType = tableType;
     }
 
-    public Long getTableType() 
+    public Integer getTableType()
     {
         return tableType;
     }
 
-    public void setTableMatchMethod(Long tableMatchMethod) 
+    public void setTableMatchMethod(Integer tableMatchMethod)
     {
         this.tableMatchMethod = tableMatchMethod;
     }
 
-    public Long getTableMatchMethod() 
+    public Integer getTableMatchMethod()
     {
         return tableMatchMethod;
     }

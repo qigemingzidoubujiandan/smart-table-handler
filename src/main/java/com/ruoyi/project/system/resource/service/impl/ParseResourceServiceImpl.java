@@ -274,7 +274,8 @@ public class ParseResourceServiceImpl implements IParseResourceService {
                 }
             };
             ExtractorConfig extractorConfig = ConfigConverter.convertToExtractorConfig(parseConfig);
-            List<ExtractedResult> extractedResults = DocumentProcessor.processFile(fileFetcher, extractorConfig);
+            DocumentProcessor documentProcessor = new DocumentProcessor(2);
+            List<ExtractedResult> extractedResults = documentProcessor.processFiles(fileFetcher, extractorConfig);
             for (ExtractedResult extractedResult : extractedResults) {
                 parseResult(parseResourceFile, parseConfig, extractedResult);
             }

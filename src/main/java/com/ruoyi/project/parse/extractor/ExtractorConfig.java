@@ -1,7 +1,7 @@
 package com.ruoyi.project.parse.extractor;
 
 import com.ruoyi.project.parse.domain.ParseTypeEnum;
-import com.ruoyi.project.parse.domain.TableMatchMethodEnum;
+import com.ruoyi.project.parse.domain.TableTypeEnum;
 import lombok.Data;
 
 import java.util.regex.Pattern;
@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 public class ExtractorConfig {
 
     private ParseTypeEnum parseType;
-    private TableMatchMethodEnum tableMatchMethod;
+    private TableTypeEnum tableType;
 
     private final String[] conditions;
     private final int expectParseRowSize;
@@ -21,14 +21,14 @@ public class ExtractorConfig {
 
     private final Pattern textPattern;
 
-    public ExtractorConfig(TableMatchMethodEnum tableMatchMethod, String[] conditions, int expectParseRowSize, String interpretConditions, boolean isMergeRow, boolean isMergeSameTitle) {
+    public ExtractorConfig(TableTypeEnum tableType, String[] conditions, int expectParseRowSize, String interpretConditions, boolean isMergeRow, boolean isMergeSameTitle) {
         this.conditions = conditions;
         this.expectParseRowSize = expectParseRowSize;
         this.interpretConditions = interpretConditions;
         this.isMergeRow = isMergeRow;
         this.isMergeSameTitle = isMergeSameTitle;
         this.textPattern = null;
-        this.tableMatchMethod = tableMatchMethod;
+        this.tableType = tableType;
         this.parseType = ParseTypeEnum.TABLE;
     }
 

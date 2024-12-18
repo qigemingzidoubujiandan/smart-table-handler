@@ -2,7 +2,7 @@ package com.ruoyi.project.parse.extractor;
 
 import com.ruoyi.project.parse.domain.ParseTypeEnum;
 import com.ruoyi.project.parse.extractor.result.ExtractedResult;
-import com.ruoyi.project.parse.domain.TableMatchMethodEnum;
+import com.ruoyi.project.parse.domain.TableTypeEnum;
 
 /**
  * @author chenl
@@ -13,7 +13,7 @@ public class ExtractorConvertor {
     public static <T, R extends ExtractedResult> IExtractor<T, R> createExtractor(ExtractorConfig extractorConfig) {
         ParseTypeEnum parseType = extractorConfig.getParseType();
         if (parseType.equals(ParseTypeEnum.TABLE)) {
-            switch (TableMatchMethodEnum.fromCode(extractorConfig.getTableMatchMethod().getCode())) {
+            switch (TableTypeEnum.fromCode(extractorConfig.getTableType().getCode())) {
                 case KV:
                     return (IExtractor<T, R>) new MapExtractor(extractorConfig);
                 case LIST:

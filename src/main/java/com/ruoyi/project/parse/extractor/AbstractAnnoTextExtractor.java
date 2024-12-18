@@ -5,6 +5,7 @@ import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.project.parse.anno.Reg;
+import com.ruoyi.project.parse.extractor.result.ExtractedResult;
 import com.ruoyi.project.parse.util.RegUtil;
 import lombok.Data;
 import lombok.SneakyThrows;
@@ -21,7 +22,7 @@ import static com.ruoyi.project.parse.extractor.unit.UnitExtractConverter.handle
 
 @Slf4j
 @Data
-public abstract class AbstractAnnoTextExtractor<T> implements IExtractor<String, T> {
+public abstract class AbstractAnnoTextExtractor<T extends ExtractedResult> implements IExtractor<String, T> {
 
     private T t;
 
