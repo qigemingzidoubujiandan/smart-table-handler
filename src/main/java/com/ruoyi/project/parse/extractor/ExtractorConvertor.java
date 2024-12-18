@@ -1,70 +1,73 @@
 package com.ruoyi.project.parse.extractor;
 
 import com.ruoyi.common.utils.text.Convert;
-import com.ruoyi.project.system.tableconfig.domain.ParseConfig;
 import com.ruoyi.project.parse.domain.ParseTypeEnum;
+import com.ruoyi.project.parse.extractor.result.ExtractedResult;
+import com.ruoyi.project.parse.extractor.result.KVExtractedResult;
+import com.ruoyi.project.parse.extractor.result.TableExtractedResult;
+import com.ruoyi.project.parse.extractor.result.TextExtractedResult;
+import com.ruoyi.project.system.tableconfig.domain.ParseConfig;
 import com.ruoyi.project.parse.domain.Table;
 import com.ruoyi.project.parse.domain.TableMatchMethodEnum;
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * @author chenl
  */
 public class ExtractorConvertor {
 
-    public static <T, R> Pair<String, ? extends IExtractor<?, ?>> createExtractor(ParseConfig parseConfig) {
-        Pair<String, ? extends IExtractor<?, ?>> pair = null;
-        if (parseConfig.getConfigType().intValue() == ParseTypeEnum.TABLE.getCode()) {
-            if (parseConfig.getTableType().intValue() == TableMatchMethodEnum.KV.getCode()) {
-                pair = ExtractorConvertor.convertToMapExtractor(parseConfig);
-            } else if (parseConfig.getTableType().intValue() == TableMatchMethodEnum.LIST.getCode()) {
-                pair = ExtractorConvertor.convertToListExtractor(parseConfig);
-            }
-        } else {
-            pair = ExtractorConvertor.convertToTextExtractor(parseConfig);
-        }
-        return pair;
-    }
-
     // 泛型工厂方法接口
     @FunctionalInterface
-    public interface ExtractorFactory<T, R> {
+    public interface ExtractorFactory<T, R extends ExtractedResult> {
         IExtractor<T, R> create(ParseConfig config);
+    }
+    public static Pair<String, ? extends IExtractor<?, ? extends ExtractedResult>> createExtractor(ParseConfig parseConfig) {
+        if (parseConfig.getConfigType().intValue() == ParseTypeEnum.TABLE.getCode()) {
+            switch (TableMatchMethodEnum.fromCode(parseConfig.getTableType().intValue())) {
+                case KV:
+                    return convertToMapExtractor(parseConfig);
+                case LIST:
+                    return convertToListExtractor(parseConfig);
+                default:
+                    throw new IllegalArgumentException("Unsupported table type: " + parseConfig.getTableType());
+            }
+        } else {
+            return convertToTextExtractor(parseConfig);
+        }
     }
 
     // 创建提取器并返回带有具体类型的 Pair
-    private static <T, R> Pair<String, IExtractor<T, R>> createExtractor(ParseConfig config, ExtractorFactory<T, R> factory) {
+    private static <T, R extends ExtractedResult> Pair<String, IExtractor<T, R>> createExtractor(ParseConfig config, ExtractorFactory<T, R> factory) {
         IExtractor<T, R> extractor = factory.create(config);
         return Pair.of(config.getParseDesc(), extractor);
     }
 
-    public static Pair<String, IExtractor<List<Table>, Map<String, String>>> convertToMapExtractor(ParseConfig config) {
+    public static Pair<String, IExtractor<List<Table>, KVExtractedResult>> convertToMapExtractor(ParseConfig config) {
         return createExtractor(config, ExtractorConvertor::buildMapExtractor);
     }
 
-    public static Pair<String, IExtractor<List<Table>, List<List<String>>>> convertToListExtractor(ParseConfig config) {
+    public static Pair<String, IExtractor<List<Table>, TableExtractedResult>> convertToListExtractor(ParseConfig config) {
         return createExtractor(config, ExtractorConvertor::buildListExtractor);
     }
 
-    public static Pair<String, IExtractor<String, String>> convertToTextExtractor(ParseConfig config) {
+    public static Pair<String, IExtractor<String, TextExtractedResult>> convertToTextExtractor(ParseConfig config) {
         return createExtractor(config, ExtractorConvertor::buildTextExtractor);
     }
 
     // 提取器的具体实现
-    private static IExtractor<String, String> buildTextExtractor(ParseConfig config) {
+    private static IExtractor<String, TextExtractedResult> buildTextExtractor(ParseConfig config) {
         return new BaseTextExtractor(Pattern.compile(config.getTextRegExpression()));
     }
 
-    public static IExtractor<List<Table>, Map<String, String>> buildMapExtractor(ParseConfig tableConfig) {
+    private static IExtractor<List<Table>, KVExtractedResult> buildMapExtractor(ParseConfig tableConfig) {
         return new MapExtractor(getConditionArr(tableConfig), -1);
     }
 
-    public static IExtractor<List<Table>, List<List<String>>> buildListExtractor(ParseConfig tableConfig) {
+    private static IExtractor<List<Table>, TableExtractedResult> buildListExtractor(ParseConfig tableConfig) {
         return new ListExtractor(
                 getConditionArr(tableConfig),
                 tableConfig.getTableExpectationRow().intValue(),
@@ -79,16 +82,19 @@ public class ExtractorConvertor {
         return Convert.toStrArray(conditions);
     }
 
-    // 批量转换配置列表
-    public static List<Pair<String, ? extends IExtractor<?, ?>>> convert(List<ParseConfig> tableConfigList) {
-        List<Pair<String, ? extends IExtractor<?, ?>>> extractorList = new ArrayList<>();
-        for (ParseConfig tableConfig : tableConfigList) {
-            if (tableConfig.getTableMatchMethod().intValue() == TableMatchMethodEnum.KV.getCode()) {
-                extractorList.add(convertToMapExtractor(tableConfig));
-            } else if (tableConfig.getTableMatchMethod().intValue() == TableMatchMethodEnum.LIST.getCode()) {
-                extractorList.add(convertToListExtractor(tableConfig));
-            }
-        }
-        return extractorList;
+    public static List<Pair<String, ? extends IExtractor<?, ? extends ExtractedResult>>> convert(List<ParseConfig> tableConfigList) {
+        return tableConfigList.stream()
+                .map(config -> {
+                    TableMatchMethodEnum matchMethod = TableMatchMethodEnum.fromCode(config.getTableMatchMethod().intValue());
+                    switch (matchMethod) {
+                        case KV:
+                            return convertToMapExtractor(config);
+                        case LIST:
+                            return convertToListExtractor(config);
+                        default:
+                            throw new IllegalArgumentException("Unsupported table match method: " + config.getTableMatchMethod());
+                    }
+                })
+                .collect(Collectors.toList());
     }
 }

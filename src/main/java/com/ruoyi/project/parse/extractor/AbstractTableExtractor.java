@@ -6,6 +6,7 @@ import com.ruoyi.project.parse.convert.UnitConvert;
 import com.ruoyi.project.parse.domain.Cell;
 import com.ruoyi.project.parse.domain.PDFTable;
 import com.ruoyi.project.parse.domain.Table;
+import com.ruoyi.project.parse.extractor.result.ExtractedResult;
 import com.ruoyi.project.parse.util.TableUtil;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -25,8 +26,7 @@ import static com.ruoyi.project.parse.convert.UnitExtractor.amountUnitExtract;
 @SuppressWarnings("rawtypes")
 @Slf4j
 @Data
-public abstract class AbstractTableExtractor<T> implements IExtractor<List<Table>, T> {
-
+public abstract class AbstractTableExtractor<T extends ExtractedResult> implements IExtractor<List<Table>, T> {
     private T parsedResult;
 
     private String[] conditions;

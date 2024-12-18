@@ -7,6 +7,7 @@ import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.project.parse.domain.Cell;
 import com.ruoyi.project.parse.domain.Table;
 import com.ruoyi.project.parse.domain.FileTypeEnum;
+import com.ruoyi.project.parse.extractor.result.TableExtractedResult;
 import com.ruoyi.project.parse.util.CollectionUtil;
 import com.ruoyi.project.parse.util.TableUtil;
 import lombok.Data;
@@ -31,26 +32,15 @@ import static com.ruoyi.project.parse.convert.UnitExtractConverter.handleAmountU
  */
 @Slf4j
 @Data
-public class ListExtractor extends AbstractTableExtractor<List<List<String>>> {
+public class ListExtractor extends AbstractTableExtractor<TableExtractedResult> {
 
     protected List<? extends Table> unresolvedTables;
-    /**
-     * 中断表格条件，满足条件就停止匹配
-     */
     protected String interpretConditions;
-
-    /**
-     * 合并相同标题表格（0不处理 1处理）
-     */
     protected String isMergeSameTitle;
-
-    /**
-     * 合并表格行
-     */
     protected String isMergeRow;
 
     public ListExtractor(String[] conditions, int expectParseRowSize, String interpretConditions, String isMergeRow, String isMergeSameTitle) {
-        this.setParsedResult(new ArrayList<>(8));
+        this.setParsedResult(new TableExtractedResult(new ArrayList<>(8)));
         this.setConditions(conditions);
         this.setExpectParseRowSize(expectParseRowSize);
         this.setInterpretConditions(interpretConditions);
@@ -70,15 +60,14 @@ public class ListExtractor extends AbstractTableExtractor<List<List<String>>> {
         fuzzyMatchingExtractTable();
     }
 
-
     @Override
     public boolean parsed() {
-        return getParsedResult().size() >= getExpectParseRowSize() && getExpectParseRowSize() > 0;
+        return getParsedResult().getTableData().size() >= getExpectParseRowSize() && getExpectParseRowSize() > 0;
     }
 
     @Override
-    public void fillMatchedData(List<List<String>> list) {
-        getParsedResult().addAll(list);
+    public void fillMatchedData(TableExtractedResult result) {
+        getParsedResult().getTableData().addAll(result.getTableData());
     }
 
     /**
@@ -234,7 +223,7 @@ public class ListExtractor extends AbstractTableExtractor<List<List<String>>> {
         }
         rows.forEach(r -> list.add(r.stream().map(Cell::text).map(format()).collect(Collectors.toList())));
         // 回调填充数据
-        this.fillMatchedData(list);
+        this.fillMatchedData(new TableExtractedResult(list));
         // pdf需要处理切割问题
         if (!parsed() && Objects.equals(table.source(), FileTypeEnum.PDF)) {
             return ExtractRet.UNFINISHED;
@@ -243,7 +232,7 @@ public class ListExtractor extends AbstractTableExtractor<List<List<String>>> {
     }
 
     /**
-     * 强制结束
+     * 强制结束，可以用来覆盖
      */
     protected boolean forceFinish(List<List<Cell>> rows, boolean isVerifyTableTitle) {
         return forceFinish(rows);

@@ -4,6 +4,7 @@ package com.ruoyi.project.parse.extractor;
 import cn.hutool.core.collection.CollUtil;
 import com.ruoyi.project.parse.domain.Cell;
 import com.ruoyi.project.parse.domain.Table;
+import com.ruoyi.project.parse.extractor.result.KVExtractedResult;
 import com.ruoyi.project.parse.util.TableUtil;
 import lombok.extern.slf4j.Slf4j;
 
@@ -25,39 +26,36 @@ import java.util.Map;
  * @author chenl
  */
 @Slf4j
-public class MapExtractor extends AbstractTableExtractor<Map<String, String>> {
+public class MapExtractor extends AbstractTableExtractor<KVExtractedResult> {
     protected List<? extends Table> unresolvedTables;
 
     public MapExtractor(String[] conditions, int expectParseRowSize) {
-        this.setParsedResult(new HashMap<>());
+        this.setParsedResult(new KVExtractedResult(new HashMap<>()));
         this.setConditions(conditions);
         this.setExpectParseRowSize(expectParseRowSize);
     }
 
     public MapExtractor(String[] conditions) {
-        this.setParsedResult(new HashMap<>());
+        this.setParsedResult(new KVExtractedResult(new HashMap<>()));
         this.setConditions(conditions);
         this.setExpectParseRowSize(-1);
     }
 
     @Override
     public boolean parsed() {
-        // 解析结果已经大于需要的结果了，暂时算解析完毕，不然还要继续向下增加
-        return getParsedResult().size() >= getExpectParseRowSize();
+        return getParsedResult().getKeyValuePairs().size() >= getExpectParseRowSize();
     }
 
     @Override
-    public void fillMatchedData(Map<String, String> map) {
-        getParsedResult().putAll(map);
+    public void fillMatchedData(KVExtractedResult result) {
+        getParsedResult().getKeyValuePairs().putAll(result.getKeyValuePairs());
     }
-
 
     @Override
     void doExtract(List<Table> tables) {
         this.unresolvedTables = tables;
         extract_KV();
     }
-
 
     /**
      * 解析 k-v 形式 (也就是只包含两个表格的形式)
@@ -101,7 +99,7 @@ public class MapExtractor extends AbstractTableExtractor<Map<String, String>> {
                 } catch (Exception e) {
                     log.error("解析异常", e);
                 }
-                this.fillMatchedData(tempMap);
+                this.fillMatchedData(new KVExtractedResult(tempMap));
             }
         }
     }

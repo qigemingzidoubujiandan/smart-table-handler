@@ -1,5 +1,8 @@
 package com.ruoyi.project.parse.parser;
 
+/**
+ * @author chenl
+ */
 public interface IParser<T, R> {
 
     /**

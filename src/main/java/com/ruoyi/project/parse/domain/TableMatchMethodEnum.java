@@ -30,6 +30,15 @@ public enum TableMatchMethodEnum {
         return null;
     }
 
+    public static TableMatchMethodEnum fromCode(int code) {
+        for (TableMatchMethodEnum value : values()) {
+            if (value.getCode() == code) {
+                return value;
+            }
+        }
+        throw new IllegalArgumentException("Unknown code: " + code);
+    }
+
     public Integer getCode() {
         return code;
     }
