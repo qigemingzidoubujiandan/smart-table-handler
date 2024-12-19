@@ -2,6 +2,7 @@ package com.ruoyi.project.parse.extractor;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.project.parse.extractor.unit.UnitConvert;
 import com.ruoyi.project.parse.domain.Cell;
 import com.ruoyi.project.parse.domain.PDFTable;
@@ -40,6 +41,15 @@ public abstract class AbstractTableExtractor<T extends ExtractedResult> implemen
 
     @Override
     public T extract(List<Table> tables) {
+        if (config.isMergeRow()) {
+            mergePDFRow(tables);
+        }
+        if (config.isMergeSameTitle()) {
+            mergeTableByThEqual(tables);
+        }
+        if (config.isRemoveEmptyRow()) {
+            delEmptyRow(tables);
+        }
         doExtract(tables);
         return parsedResult;
     }
@@ -103,6 +113,7 @@ public abstract class AbstractTableExtractor<T extends ExtractedResult> implemen
      * 智能的处理表格样式
      */
     protected static void smartHandleTable(List<Table> tableList) {
+        delEmptyRow(tableList);
         // 合并相同标题表格
         mergeTableByThEqual(tableList);
         // 合并因pdf切割，导致cell被切开成的数据
@@ -127,7 +138,7 @@ public abstract class AbstractTableExtractor<T extends ExtractedResult> implemen
                 List<List<Cell>> data = preTable.getData();
                 List<List<Cell>> lists = table.getData().subList(1, table.getData().size());
                 data.addAll(lists);
-                preTable.setNotEmptyData(data);
+                preTable.setData(data);
                 // 删掉当前表格
                 tableList.remove(table);
             } else {
@@ -212,11 +223,11 @@ public abstract class AbstractTableExtractor<T extends ExtractedResult> implemen
             // 移除当前，添加split后的
             tableList.remove(i);
             Table newTable = new PDFTable();
-            newTable.setNotEmptyData(newCellList1);
+            newTable.setData(newCellList1);
             tableList.add(newTable);
 
             Table newTable2 = new PDFTable();
-            newTable2.setNotEmptyData(newCellList2);
+            newTable2.setData(newCellList2);
             tableList.add(newTable2);
         }
     }
@@ -349,13 +360,27 @@ public abstract class AbstractTableExtractor<T extends ExtractedResult> implemen
                 data.remove(data.size() - 1);
                 List<List<Cell>> data2 = next.getData();
                 data2.remove(0);
-                next.setNotEmptyData(data2);
+                next.setData(data2);
                 // 添加合并的
                 data.add(cellList);
-                pre.setNotEmptyData(data);
+                pre.setData(data);
             }
             preIndex++;
         }
+    }
+
+    public static void delEmptyRow(List<? extends Table> tables) {
+        if (tables == null || tables.isEmpty()) {
+            return;
+        }
+
+        tables.forEach(table -> {
+            table.setData(
+                    table.getData().stream()
+                            .filter(row -> row.stream().anyMatch(cell -> !StringUtils.isEmpty(cell.text())))
+                            .collect(Collectors.toList())
+            );
+        });
     }
 
 }

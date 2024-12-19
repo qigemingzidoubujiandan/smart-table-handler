@@ -69,7 +69,7 @@ public class HtmlTableParser extends AbstractTableParser<String> {
             // 兼容某些页面格式不规范问题
             if (CollUtil.isEmpty(th) && CollUtil.isNotEmpty(tdList) && tdList.get(0).size() > 2) {
                 htmlTable.setThList(tdList.get(0));
-                htmlTable.setNotEmptyData(tdList.subList(1, tdList.size()));
+                htmlTable.setData(tdList.subList(1, tdList.size()));
             }
         });
         // 处理附加信息

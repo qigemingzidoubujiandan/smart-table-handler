@@ -1,6 +1,6 @@
 package com.ruoyi.project.parse.extractor;
 
-import com.ruoyi.project.parse.domain.ParseTypeEnum;
+import com.ruoyi.project.parse.domain.Enum.ParseTypeEnum;
 import com.ruoyi.project.parse.extractor.result.ExtractedResult;
 import com.ruoyi.project.parse.domain.TableTypeEnum;
 

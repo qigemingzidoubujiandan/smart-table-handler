@@ -6,7 +6,8 @@ import cn.hutool.core.util.StrUtil;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.project.parse.domain.Cell;
 import com.ruoyi.project.parse.domain.Table;
-import com.ruoyi.project.parse.domain.FileTypeEnum;
+import com.ruoyi.project.parse.domain.Enum.FileTypeEnum;
+import com.ruoyi.project.parse.domain.Enum.TableMatchMethodEnum;
 import com.ruoyi.project.parse.extractor.result.TableExtractedResult;
 import com.ruoyi.project.parse.util.CollectionUtil;
 import com.ruoyi.project.parse.util.TableUtil;
@@ -44,14 +45,13 @@ public class ListExtractor extends AbstractTableExtractor<TableExtractedResult> 
     }
 
     @Override
-    protected void doExtract(List<Table> unresolvedTables) {
-        if (config.isMergeRow()) {
-            mergePDFRow(unresolvedTables);
+    protected void doExtract(List<Table> tables) {
+
+        if (TableMatchMethodEnum.EXACT.equals(config.getTableMatchMethod())) {
+            exactMatchingExtractTable(tables);
+        } else {
+            fuzzyMatchingExtractTable(tables);
         }
-        if (config.isMergeSameTitle()) {
-            mergeTableByThEqual(unresolvedTables);
-        }
-        fuzzyMatchingExtractTable(unresolvedTables);
     }
 
     @Override

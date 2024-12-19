@@ -3,7 +3,8 @@ package com.ruoyi.project.system.resource.convert;
 import java.util.regex.Pattern;
 
 import com.ruoyi.common.utils.text.Convert;
-import com.ruoyi.project.parse.domain.ParseTypeEnum;
+import com.ruoyi.project.parse.domain.Enum.ParseTypeEnum;
+import com.ruoyi.project.parse.domain.Enum.TableMatchMethodEnum;
 import com.ruoyi.project.parse.domain.TableTypeEnum;
 import com.ruoyi.project.parse.extractor.ExtractorConfig;
 import com.ruoyi.project.system.tableconfig.domain.ParseConfig;
@@ -32,11 +33,14 @@ public class ConfigConverter {
         if (configType.equals(ParseTypeEnum.TABLE.getCode())) { // 表格配置
             return new ExtractorConfig(
                     TableTypeEnum.get(parseConfig.getTableType()),
+                    TableMatchMethodEnum.get(parseConfig.getTableMatchMethod()),
                     Convert.toStrArray(parseConfig.getTableConditions()),
                     parseConfig.getTableExpectationRow().intValue(),
                     parseConfig.getTableInterpretConditions(),
                     "1".equals(parseConfig.getTableIsMergeRow()),
-                    "1".equals(parseConfig.getTableIsMergeSameTitle()));
+                    "1".equals(parseConfig.getTableIsMergeSameTitle()),
+                    "1".equals(parseConfig.getTableIsMergeSameTitle())
+            );
         } else if (configType.equals(ParseTypeEnum.TEXT.getCode())) { // 文本配置
             String textRegExpression = parseConfig.getTextRegExpression();
             if (textRegExpression == null || textRegExpression.isEmpty()) {

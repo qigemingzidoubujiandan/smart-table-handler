@@ -65,9 +65,6 @@ public class TabulaPDFTableParser extends AbstractTableParser<String> {
         }
         //删除空表
         delEmptyTable(pdfTables);
-        checkPdfTh(pdfTables);
-        //删除各表空行
-        delEmptyTh(pdfTables);
         AbstractTableParser.handleExt(pdfTables);
 
         return pdfTables;

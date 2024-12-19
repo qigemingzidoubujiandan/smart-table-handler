@@ -16,7 +16,6 @@ import static com.ruoyi.project.parse.extractor.unit.UnitExtractor.amountUnitExt
 
 public abstract class AbstractTableParser<T> implements IParser<T, List<? extends Table>> {
 
-
     /**
      * 处理扩展信息，先放这里吧
      */
@@ -40,59 +39,6 @@ public abstract class AbstractTableParser<T> implements IParser<T, List<? extend
                     }
                 });
             }
-        });
-    }
-
-    protected void checkPdfTh(List<? extends Table> tables) {
-        if (tables == null || tables.isEmpty()) {
-            return;
-        }
-        tables.forEach(table -> {
-            boolean isEmpty = true;
-            if (table.getData().size() != 0) {
-                while (isEmpty) {
-                    List<? extends Cell> list = table.getTh();
-                    if (CollectionUtil.isEmpty(list)) {
-                        break;
-                    }
-                    AtomicInteger i = new AtomicInteger();
-                    list.forEach(cell -> {
-                        if (StringUtils.isEmpty(cell.text())) {
-                            i.getAndIncrement();
-                        }
-                    });
-                    //表示该表头为空
-                    if (i.get() == list.size()) {
-                        table.passTh();
-                        i.set(0);
-                    } else {
-                        isEmpty = false;
-                    }
-                }
-            }
-        });
-    }
-
-    protected void delEmptyTh(List<? extends Table> tables) {
-        if (tables == null || tables.isEmpty()) {
-            return;
-        }
-        tables.forEach(table -> {
-            List<List<Cell>> data = table.getData();
-            Iterator<List<Cell>> it = data.iterator();
-            while (it.hasNext()) {
-                List<Cell> th = it.next();
-                AtomicInteger i = new AtomicInteger();
-                th.forEach(cell -> {
-                    if (StringUtils.isEmpty(cell.text())) {
-                        i.getAndIncrement();
-                    }
-                });
-                if (i.get() == th.size()) {
-                    it.remove();
-                }
-            }
-            table.setNotEmptyData(data);
         });
     }
 

@@ -3,8 +3,8 @@ package com.ruoyi.project.parse.parser;
 import cn.hutool.core.io.FileUtil;
 import com.google.common.collect.Maps;
 import com.ruoyi.common.exception.ServiceException;
-import com.ruoyi.project.parse.domain.FileTypeEnum;
-import com.ruoyi.project.parse.domain.ParseTypeEnum;
+import com.ruoyi.project.parse.domain.Enum.FileTypeEnum;
+import com.ruoyi.project.parse.domain.Enum.ParseTypeEnum;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;

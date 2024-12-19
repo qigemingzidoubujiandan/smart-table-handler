@@ -5,8 +5,8 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.ruoyi.project.parse.domain.Cell;
+import com.ruoyi.project.parse.domain.DefaultCell;
 import com.ruoyi.project.parse.domain.PDFTable;
-import com.ruoyi.project.parse.domain.PDFTableCell;
 import com.ruoyi.project.parse.util.YamlUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -59,9 +59,6 @@ public class PyPDFPlumberTableParser extends AbstractTableParser<String> {
             List<PDFTable> tableList = convertToPdfTable(pyPrint);
 
             delEmptyTable(tableList);
-            checkPdfTh(tableList);
-            //删除各表空行
-            delEmptyTh(tableList);
             AbstractTableParser.handleExt(tableList);
             return tableList;
         } catch (Exception e) {
@@ -89,14 +86,14 @@ public class PyPDFPlumberTableParser extends AbstractTableParser<String> {
                         List<Cell> pdfRow = new ArrayList<>();
                         List<String> row = JSONUtil.toList(JSONUtil.parseArray(rowObj), String.class);
                         for (String cellText : row) {
-                            PDFTableCell pdfTableCell = Optional.ofNullable(cellText)
-                                    .map(c -> new PDFTableCell(cellText.replaceAll("\\s*|\n|\t|\r", "")))
-                                    .orElse(new PDFTableCell(""));
+                            DefaultCell pdfTableCell = Optional.ofNullable(cellText)
+                                    .map(c -> new DefaultCell(cellText.replaceAll("\\s*|\n|\t|\r", "")))
+                                    .orElse(new DefaultCell(""));
                             pdfRow.add(pdfTableCell);
                         }
                         pdfRowList.add(pdfRow);
                     }
-                    pdfTable.setNotEmptyData(pdfRowList);
+                    pdfTable.setData(pdfRowList);
                     pdfTableList.add(pdfTable);
                 }
         );

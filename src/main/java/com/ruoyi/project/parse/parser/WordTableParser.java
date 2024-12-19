@@ -89,9 +89,6 @@ public class WordTableParser extends AbstractTableParser<String> {
 
         //删除空表
         delEmptyTable(wordTableList);
-        checkPdfTh(wordTableList);
-        //删除各表空行
-        delEmptyTh(wordTableList);
         AbstractTableParser.handleExt(wordTableList);
         return wordTableList;
     }
@@ -113,7 +110,7 @@ public class WordTableParser extends AbstractTableParser<String> {
                     }
                     rowList.add(cellList);
                 }
-                wordTable.setNotEmptyData(rowList);
+                wordTable.setData(rowList);
                 wordTableList.add(wordTable);
             }
         }
@@ -131,7 +128,7 @@ public class WordTableParser extends AbstractTableParser<String> {
                                 .map(Cell.class::cast)
                                 .collect(Collectors.toList()))
                         .collect(Collectors.toList());
-                wordTable.setNotEmptyData(rowList);
+                wordTable.setData(rowList);
                 wordTableList.add(wordTable);
             }
         }

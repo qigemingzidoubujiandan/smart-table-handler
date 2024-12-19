@@ -1,19 +1,20 @@
-package com.ruoyi.project.parse.domain;
+package com.ruoyi.project.parse.domain.Enum;
 
-public enum ParseTypeEnum {
-    TABLE(1, "table"),
-    TEXT(2, "text");
+public enum FileTypeEnum {
+    HTML(1, "html"),
+    PDF(2, "pdf"),
+    WORD(3, "word");
 
     private final Integer code;
     private final String desc;
 
-    ParseTypeEnum(Integer code, String desc) {
+    FileTypeEnum(Integer code, String desc) {
         this.code = code;
         this.desc = desc;
     }
 
-    public static ParseTypeEnum get(Integer code) {
-        for (ParseTypeEnum item : ParseTypeEnum.values()) {
+    public static FileTypeEnum get(Integer code) {
+        for (FileTypeEnum item : FileTypeEnum.values()) {
             if (item.getCode().equals(code)) {
                 return item;
             }
@@ -21,8 +22,8 @@ public enum ParseTypeEnum {
         return null;
     }
 
-    public static ParseTypeEnum getByDesc(String desc) {
-        for (ParseTypeEnum item : ParseTypeEnum.values()) {
+    public static FileTypeEnum getByDesc(String desc) {
+        for (FileTypeEnum item : FileTypeEnum.values()) {
             if (item.getDesc().equals(desc)) {
                 return item;
             }

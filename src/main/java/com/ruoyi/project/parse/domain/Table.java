@@ -1,40 +1,45 @@
 package com.ruoyi.project.parse.domain;
 
+import cn.hutool.core.collection.CollUtil;
+import com.ruoyi.project.parse.domain.Enum.FileTypeEnum;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.List;
 
 /**
  * 表格
  */
 @SuppressWarnings("rawtypes")
-public interface Table {
+public abstract class Table {
 
+    /**
+     * 是否被抽取过
+     */
+    @Setter
+    @Getter
+    private boolean extracted;
+    private List<List<Cell>> data;
 
     /**
      * 获取所有的表头
      */
-    List<? extends Cell> getTh();
+    public List<? extends Cell> getTh() {
+        return !data.isEmpty() ? data.get(0) : null;
+    }
 
-    FileTypeEnum source();
-
-    /**
-     * 是否抽取过
-     */
-    boolean isExtracted();
+    public abstract FileTypeEnum source();
 
     /**
      * 所有的cell
      */
-    List<List<Cell>> getData();
+    public List<List<Cell>> getData() {
+        return data;
+    }
 
-    /**
-     * 设置抽取过
-     */
-    void setExtracted(boolean b);
-
-    /**
-     * 删除表头
-     */
-    void passTh();
-
-    void setNotEmptyData(List<List<Cell>> data);
+    public void setData(List<List<Cell>> data) {
+        if (CollUtil.isNotEmpty(data)) {
+            this.data = data;
+        }
+    }
 }

@@ -1,7 +1,8 @@
 package com.ruoyi.project.parse.parser;
 
+import com.ruoyi.project.parse.domain.Cell;
+import com.ruoyi.project.parse.domain.DefaultCell;
 import com.ruoyi.project.parse.domain.PDFTable;
-import com.ruoyi.project.parse.domain.PDFTableCell;
 import com.spire.pdf.PdfDocument;
 import com.spire.pdf.utilities.PdfTable;
 import com.spire.pdf.utilities.PdfTableExtractor;
@@ -41,9 +42,6 @@ public class SpirePDFTableParser extends AbstractTableParser<String> {
 
                 //删除空表
                 delEmptyTable(pdfTableList);
-                checkPdfTh(pdfTableList);
-                //删除各表空行
-                delEmptyTh(pdfTableList);
                 AbstractTableParser.handleExt(pdfTableList);
             }
         } catch (Exception e) {
@@ -103,11 +101,11 @@ public class SpirePDFTableParser extends AbstractTableParser<String> {
 
     private PDFTable convertToPDFTable(PdfTable table) {
         PDFTable pdfTable = new PDFTable();
-        List<List<PDFTableCell>> pdfRow = new ArrayList<>();
+        List<List<Cell>> pdfRow = new ArrayList<>();
         for (int i = 0; i < table.getRowCount(); i++) {
-            List<PDFTableCell> pdfCell = new ArrayList<>();
+            List<Cell> pdfCell = new ArrayList<>();
             for (int j = 0; j < table.getColumnCount(); j++) {
-                PDFTableCell pdfTableCell = new PDFTableCell();
+                Cell pdfTableCell = new DefaultCell();
                 pdfTableCell.setText(table.getText(i, j).replaceAll("\\s*|\r|\n|\t", ""));
                 pdfCell.add(pdfTableCell);
             }
