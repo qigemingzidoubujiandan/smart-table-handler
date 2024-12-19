@@ -41,6 +41,26 @@ public abstract class AbstractTableExtractor<T extends ExtractedResult> implemen
 
     @Override
     public T extract(List<Table> tables) {
+        if (tables == null || tables.isEmpty()) {
+            return parsedResult;
+        }
+
+        applyPreprocess(tables);
+        doExtract(tables);
+
+        return parsedResult;
+    }
+
+    private void applyPreprocess(List<Table> tables) {
+        if (config.isSmartHandle()) {
+            smartHandleTable(tables);
+            return;
+        }
+
+        performStandardPreprocess(tables);
+    }
+
+    private void performStandardPreprocess(List<Table> tables) {
         if (config.isMergeRow()) {
             mergePDFRow(tables);
         }
@@ -50,8 +70,10 @@ public abstract class AbstractTableExtractor<T extends ExtractedResult> implemen
         if (config.isRemoveEmptyRow()) {
             delEmptyRow(tables);
         }
-        doExtract(tables);
-        return parsedResult;
+        if (config.isKvTableOptimization()) {
+            obtainKVTableByMultipleColumn(tables);
+            splitKVTable(tables);
+        }
     }
 
     protected abstract void doExtract(List<Table> tables);
@@ -113,6 +135,7 @@ public abstract class AbstractTableExtractor<T extends ExtractedResult> implemen
      * 智能的处理表格样式
      */
     protected static void smartHandleTable(List<Table> tableList) {
+        // 删除空行
         delEmptyRow(tableList);
         // 合并相同标题表格
         mergeTableByThEqual(tableList);
@@ -120,6 +143,8 @@ public abstract class AbstractTableExtractor<T extends ExtractedResult> implemen
         mergePDFRow(tableList);
         // 从单个格式混乱表格中拆分kv类型表格
         splitKVTable(tableList);
+        // 重多列表格种抽取KV表格
+        obtainKVTableByMultipleColumn(tableList);
     }
 
     /**
@@ -374,13 +399,41 @@ public abstract class AbstractTableExtractor<T extends ExtractedResult> implemen
             return;
         }
 
-        tables.forEach(table -> {
-            table.setData(
-                    table.getData().stream()
-                            .filter(row -> row.stream().anyMatch(cell -> !StringUtils.isEmpty(cell.text())))
-                            .collect(Collectors.toList())
-            );
-        });
+        tables.forEach(table -> table.setData(
+                table.getData().stream()
+                        .filter(row -> row.stream().anyMatch(cell -> !StringUtils.isEmpty(cell.text())))
+                        .collect(Collectors.toList())
+        ));
     }
+
+    /**
+     * 获取表格中所有2列的数据，抽取成新表格。
+     */
+    public static void obtainKVTableByMultipleColumn(List<Table> tableList) {
+        List<Table> newTables = org.apache.commons.compress.utils.Lists.newArrayList();
+        for (Table table : tableList) {
+            List<List<Cell>> tableData = table.getData();
+            long only2NotEmptyCount = tableData.stream()
+                    .filter(t -> t.stream().filter(l -> StrUtil.isNotEmpty(l.text())).count() == 2).count();
+
+            if (only2NotEmptyCount > 0) {
+                Table newTable = obtainKVTableByMultipleColumn(table);
+                newTables.add(newTable);
+            }
+        }
+        tableList.addAll(newTables);
+    }
+
+    private static Table obtainKVTableByMultipleColumn(Table table) {
+        List<List<Cell>> data = table.getData();
+        List<List<Cell>> newCellList =
+                data.stream().map(d -> d.stream().filter(t -> StrUtil.isNotEmpty(t.text())).collect(Collectors.toList()))
+                        .filter(l -> l.size() == 2).collect(Collectors.toList());
+
+        Table newTable = new PDFTable();
+        newTable.setData(newCellList);
+        return newTable;
+    }
+
 
 }

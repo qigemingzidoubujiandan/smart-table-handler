@@ -23,21 +23,28 @@ public abstract class AbstractTableParser<T> implements IParser<T, List<? extend
         handleExt(tables, null);
     }
 
+    /**
+     * 每个单元格都处理，不确定那个作为表头
+     * @param tables
+     * @param func
+     */
     @SuppressWarnings({"rawtypes", "unchecked"})
     public static void handleExt(List<? extends Table> tables, List<Function<String, String>> func) {
         if (tables == null || tables.isEmpty()) {
             return;
         }
         tables.forEach(r -> {
-            List<? extends Cell> list = r.getTh();
-            if (CollUtil.isNotEmpty(list)) {
-                list.forEach(th -> {
-                    String ext =
-                            CollUtil.isEmpty(func) ? amountUnitExtract(th.text()) : amountUnitExtract(func, th.text());
-                    if (CharSequenceUtil.isNotEmpty(ext)) {
-                        th.setExt(ext);
-                    }
-                });
+            List<List<Cell>> data = r.getData();
+            for (List<Cell> list : data) {
+                if (CollUtil.isNotEmpty(list)) {
+                    list.forEach(th -> {
+                        String ext =
+                                CollUtil.isEmpty(func) ? amountUnitExtract(th.text()) : amountUnitExtract(func, th.text());
+                        if (CharSequenceUtil.isNotEmpty(ext)) {
+                            th.setExt(ext);
+                        }
+                    });
+                }
             }
         });
     }

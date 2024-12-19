@@ -121,7 +121,7 @@ public class Constants
             "org.springframework", "com.ruoyi.common.utils.file", "com.ruoyi.framework.config", "com.ruoyi.project.tool" };
 
     /** 是 */
-    public static final String YES = "1";
+    public static final Integer YES = 1;
     /** 否 */
-    public static final String NO = "0";
+    public static final Integer NO = 0;
 }

@@ -23,40 +23,49 @@ import java.util.regex.Pattern;
 public class UnitConvert {
 
     @Getter
-    private static final EnumMap<Unit, Function<String, String>> amountConvertFactory;
+    private static final EnumMap<Unit, Function<String, String>> amountConvertFactory = new EnumMap<>(Unit.class);;
 
+//    static {
+//        amountConvertFactory = new EnumMap<>(Unit.class);
+//        amountConvertFactory.put(Unit.YUAN, UnitConvert::convert_yuan);
+//        amountConvertFactory.put(Unit.WAN_YUAN, UnitConvert::convert_wan_yuan);
+//        amountConvertFactory.put(Unit.YI_YUAN, UnitConvert::convert_yi_yuan);
+//        amountConvertFactory.put(Unit.YI, UnitConvert::convert_yi_yuan);
+//        amountConvertFactory.put(Unit.WAN, UnitConvert::convert_wan_yuan);
+//
+//        // TODO 美元暂默认和元处理一致。否则入库为null
+//        amountConvertFactory.put(Unit.MEI_YUAN, UnitConvert::convert_yuan);
+//        amountConvertFactory.put(Unit.WAN_MEI_YUAN, UnitConvert::convert_wan_yuan);
+//        amountConvertFactory.put(Unit.YI_MEI_YUAN, UnitConvert::convert_yi_yuan);
+//
+//        amountConvertFactory.put(Unit.GANG_BI, UnitConvert::convert_yuan);
+//        amountConvertFactory.put(Unit.WAN_GANG_BI, UnitConvert::convert_wan_yuan);
+//        amountConvertFactory.put(Unit.YI_GANG_BI, UnitConvert::convert_yi_yuan);
+//
+//        amountConvertFactory.put(Unit.YING_BANG, UnitConvert::convert_yuan);
+//        amountConvertFactory.put(Unit.WAN_YING_BANG, UnitConvert::convert_wan_yuan);
+//        amountConvertFactory.put(Unit.YI_YING_BANG, UnitConvert::convert_yi_yuan);
+//
+//        amountConvertFactory.put(Unit.AUD, UnitConvert::convert_yuan);
+//        amountConvertFactory.put(Unit.WAN_AUD, UnitConvert::convert_wan_yuan);
+//        amountConvertFactory.put(Unit.YI_AUD, UnitConvert::convert_yi_yuan);
+//
+//        amountConvertFactory.put(Unit.EURO, UnitConvert::convert_yuan);
+//        amountConvertFactory.put(Unit.WAN_EURO, UnitConvert::convert_wan_yuan);
+//        amountConvertFactory.put(Unit.YI_EURO, UnitConvert::convert_yi_yuan);
+//
+//        amountConvertFactory.put(Unit.FEN, UnitConvert::convert_fen);
+//        amountConvertFactory.put(Unit.WAN_FEN, UnitConvert::convert_wan_fen);
+//        amountConvertFactory.put(Unit.YI_FEN, UnitConvert::convert_yi_fen);
+//    }
+
+    // 初始化静态工厂时直接使用枚举常量进行映射
     static {
-        amountConvertFactory = new EnumMap<>(Unit.class);
-        amountConvertFactory.put(Unit.YUAN, UnitConvert::convert_yuan);
-        amountConvertFactory.put(Unit.WAN_YUAN, UnitConvert::convert_wan_yuan);
-        amountConvertFactory.put(Unit.YI_YUAN, UnitConvert::convert_yi_yuan);
-        amountConvertFactory.put(Unit.YI, UnitConvert::convert_yi_yuan);
-        amountConvertFactory.put(Unit.WAN, UnitConvert::convert_wan_yuan);
-
-        // TODO 美元暂默认和元处理一致。否则入库为null
-        amountConvertFactory.put(Unit.MEI_YUAN, UnitConvert::convert_yuan);
-        amountConvertFactory.put(Unit.WAN_MEI_YUAN, UnitConvert::convert_wan_yuan);
-        amountConvertFactory.put(Unit.YI_MEI_YUAN, UnitConvert::convert_yi_yuan);
-
-        amountConvertFactory.put(Unit.GANG_BI, UnitConvert::convert_yuan);
-        amountConvertFactory.put(Unit.WAN_GANG_BI, UnitConvert::convert_wan_yuan);
-        amountConvertFactory.put(Unit.YI_GANG_BI, UnitConvert::convert_yi_yuan);
-
-        amountConvertFactory.put(Unit.YING_BANG, UnitConvert::convert_yuan);
-        amountConvertFactory.put(Unit.WAN_YING_BANG, UnitConvert::convert_wan_yuan);
-        amountConvertFactory.put(Unit.YI_YING_BANG, UnitConvert::convert_yi_yuan);
-
-        amountConvertFactory.put(Unit.AUD, UnitConvert::convert_yuan);
-        amountConvertFactory.put(Unit.WAN_AUD, UnitConvert::convert_wan_yuan);
-        amountConvertFactory.put(Unit.YI_AUD, UnitConvert::convert_yi_yuan);
-
-        amountConvertFactory.put(Unit.EURO, UnitConvert::convert_yuan);
-        amountConvertFactory.put(Unit.WAN_EURO, UnitConvert::convert_wan_yuan);
-        amountConvertFactory.put(Unit.YI_EURO, UnitConvert::convert_yi_yuan);
-
-        amountConvertFactory.put(Unit.FEN, UnitConvert::convert_fen);
-        amountConvertFactory.put(Unit.WAN_FEN, UnitConvert::convert_wan_fen);
-        amountConvertFactory.put(Unit.YI_FEN, UnitConvert::convert_yi_fen);
+        for (Unit unit : Unit.values()) {
+            if (!unit.equals(Unit.DEFAULT_IDENTITY)) {
+                amountConvertFactory.put(unit, amount -> convert(amount, unit));
+            }
+        }
     }
 
     //    static final Pattern AMOUNT_PATTERN = Pattern.compile("^([0-9]+|[0-9]{1,3}(,[0-9]{3})*)(.[0-9]{1,2})?$");
