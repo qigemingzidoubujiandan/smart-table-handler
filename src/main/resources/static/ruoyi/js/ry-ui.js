@@ -398,9 +398,7 @@ var table = {
             exportExcelById: function(id) {
                 table.set();
                 $.modal.confirm("确定导出" + table.options.modalName + "吗？", function() {
-                    if ($.common.isNotEmpty(id)) {
-                        table.options.exportUrl = table.options.exportUrl.replace("{id}", id);
-                    }
+                    table.options.exportUrl = table.options.exportUrl.replace("{id}", id);
                     $.modal.loading("正在导出数据，请稍候...");
                     $.post(table.options.exportUrl, null, function(result) {
                         if (result.code == web_status.SUCCESS) {

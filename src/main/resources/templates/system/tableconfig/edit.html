@@ -106,7 +106,7 @@
             </div>
             <div class="col-xs-12" id="text-regexp-section">
                 <div class="form-group">
-                    <label class="col-sm-3 control-label">文本:正则表达式：</label>
+                    <label class="col-sm-3 control-label">文本:正则表达式<br>需含一个"()"</label>
                     <div class="col-sm-8">
                         <textarea name="textRegExpression" class="form-control" th:text="*{textRegExpression}" required></textarea>
                         <span id="regex-error-message" style="color: red; display: none;">正则表达式有误，请检查。</span>
@@ -170,16 +170,42 @@
             }
         });
 
-        // 添加自定义验证方法用于正则表达式检查
         $.validator.addMethod("regexValidation", function(value, element) {
+            // 首先，尝试创建 RegExp 对象以确保正则表达式是有效的。
             try {
                 new RegExp(value);
-                return true;
             } catch (e) {
+                return false; // 正则表达式无效
+            }
+
+            // 接下来，检查正则表达式字符串中是否存在未转义的括号对。
+            // 通过替换所有已转义的字符，然后检查剩余字符串中是否有括号对。
+            const cleanedValue = value.replace(/\\./g, ''); // 移除所有转义序列
+            let openParenthesesCount = 0;
+            let hasUnescapedParentheses = false;
+
+            for (let i = 0; i < cleanedValue.length; i++) {
+                if (cleanedValue[i] === '(') {
+                    openParenthesesCount++;
+                    hasUnescapedParentheses = true;
+                } else if (cleanedValue[i] === ')') {
+                    if (openParenthesesCount > 0) {
+                        openParenthesesCount--;
+                    } else {
+                        // 如果右括号多于左括号，则格式不正确
+                        return false;
+                    }
+                }
+            }
+
+            // 检查是否有未匹配的左括号
+            if (openParenthesesCount !== 0) {
                 return false;
             }
-        }, "正则表达式有误，请检查。");
 
+            // 最后，确保至少存在一对括号
+            return hasUnescapedParentheses;
+        }, "正则表达式有误或缺少必要的括号，请检查。");
         function submitHandler() {
             if ($("#form-tableconfig-edit").valid()) {
                 $.operate.save(prefix + "/edit", $('#form-tableconfig-edit').serialize());
