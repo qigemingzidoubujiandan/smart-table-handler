@@ -2,7 +2,6 @@ package com.ruoyi.project.parse.parser;
 
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.collection.ListUtil;
 import com.google.common.collect.Lists;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.project.parse.domain.Cell;
@@ -72,8 +71,6 @@ public class HtmlTableParser extends AbstractTableParser<String> {
                 htmlTable.setData(tdList.subList(1, tdList.size()));
             }
         });
-        // 处理附加信息
-        AbstractTableParser.handleExt(htmlTables);
         return htmlTables;
     }
 

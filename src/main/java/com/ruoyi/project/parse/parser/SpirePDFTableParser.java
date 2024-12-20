@@ -39,20 +39,11 @@ public class SpirePDFTableParser extends AbstractTableParser<String> {
                 } else {
                     parseTable(pdfTableList, pdf);
                 }
-
-                //删除空表
-                delEmptyTable(pdfTableList);
-                AbstractTableParser.handleExt(pdfTableList);
             }
         } catch (Exception e) {
             if (pdf != null) {
                 pdf.close();
             }
-            log.warn("[SpirePDFTableParser]解析出现异常!path:{}", dataSource, e);
-            log.warn("[SpirePDFTableParser] 降级----- TabulaPDFTableParser start !path:{}", dataSource, e);
-            TabulaPDFTableParser parser = new TabulaPDFTableParser();
-            log.warn("[SpirePDFTableParser] 降级----- TabulaPDFTableParser end !path:{}", dataSource, e);
-            return parser.parse(dataSource);
         } finally {
             if (pdf != null) {
                 pdf.close();

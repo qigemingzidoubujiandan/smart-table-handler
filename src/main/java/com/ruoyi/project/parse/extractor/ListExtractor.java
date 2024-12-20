@@ -42,7 +42,6 @@ import static com.ruoyi.project.parse.extractor.unit.UnitExtractConverter.handle
  * -------------------------------------------------------------------
  */
 @Slf4j
-@Data
 public class ListExtractor extends AbstractTableExtractor<TableExtractedResult> {
 
     public ListExtractor(ExtractorConfig config) {
@@ -235,6 +234,17 @@ public class ListExtractor extends AbstractTableExtractor<TableExtractedResult> 
         return ExtractRet.FINISH;
     }
 
+
+    protected static void fillThFunction(List<Function<String, String>> thFunc, List<? extends Cell> thList) {
+        // 处理表头单位
+        if (CollUtil.isEmpty(thFunc)) {
+            thList.stream().map(thCell ->
+                            UnitConvert.Unit.getByUnit(String.valueOf(thCell.ext())))
+                    .map(unit -> UnitConvert.getAmountConvertFactory().get(unit))
+                    .forEach(thFunc::add);
+        }
+    }
+
     /**
      * 强制结束，可以用来覆盖
      */
@@ -387,21 +397,21 @@ public class ListExtractor extends AbstractTableExtractor<TableExtractedResult> 
     //-------------------------------------------------------------------多行标题处理-------------------------------------
 
     /**
-     *多行标题处理
-     *<p>
-     * 解决表格存在不同表头相同含义的场景。
+     * 多行标题处理
+     * <p>
      * ex：
-     *     产品类型        本期               上期
-     *             数量（只） 金额（万元） 数量（只）金额（万元）
-     *    匹配条件传：["产品类型","本期", "上期", "数量", "金额", "数量", "金额"];
-     *</p>
+     * 产品类型             本期                   上期
+     *              数量（只） 金额（万元）    数量（只）金额（万元）
+     * 匹配条件传：["产品类型","本期", "上期", "数量", "金额", "数量", "金额"];
+     * </p>
+     *
      * @param table
      * @param thFunc
      * @param isVerifyTableTitle
      * @return
      */
     private int fuzzyMatchingExtractTableByMultipleTitle(Table table, List<Function<String, String>> thFunc,
-                                  boolean isVerifyTableTitle) {
+                                                         boolean isVerifyTableTitle) {
         if (this.parsed()) {
             return ExtractRet.FINISH;
         }

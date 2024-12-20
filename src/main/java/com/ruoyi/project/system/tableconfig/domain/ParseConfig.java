@@ -68,9 +68,18 @@ public class ParseConfig extends BaseEntity {
     private Integer tableExpectationRow;
 
     /**
+     * 多行表头的行数
+     */
+    private Integer tableThMultipleRowNumber;
+
+    /**
      * 合并相同标题表格
      */
     private Integer tableIsMergeSameTitle;
+    /**
+     * 是否处理单位
+     */
+    private Integer tableIsHandleUnit;
 
     /**
      * 合并表格行

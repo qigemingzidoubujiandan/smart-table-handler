@@ -28,6 +28,7 @@ public class ExtractorConfig {
     private final boolean isRemoveEmptyRow;
     private final boolean isSmartHandle;
     private final boolean isKvTableOptimization;
+    private final boolean isHandleUnit;
 
     private final Pattern textPattern;
 
@@ -46,6 +47,7 @@ public class ExtractorConfig {
         this.textPattern = builder.textPattern;
         this.isOpenThMultipleRowMatch = builder.isOpenThMultipleRowMatch;
         this.thMultipleRowNumber = builder.thMultipleRowNumber;
+        this.isHandleUnit = builder.isHandleUnit;
     }
 
     public static class Builder {
@@ -57,6 +59,7 @@ public class ExtractorConfig {
         private int expectParseRowSize;
         private String interpretConditions;
 
+        private boolean isHandleUnit = true;
         private boolean isMergeRow;
         private boolean isMergeSameTitle;
         private boolean isOpenThMultipleRowMatch = false;
@@ -94,6 +97,11 @@ public class ExtractorConfig {
 
         public Builder setInterpretConditions(String interpretConditions) {
             this.interpretConditions = interpretConditions;
+            return this;
+        }
+
+        public Builder setIsHandleUnit(boolean isHandleUnit) {
+            this.isHandleUnit = isHandleUnit;
             return this;
         }
 
@@ -142,12 +150,11 @@ public class ExtractorConfig {
         }
     }
 
-    // Convenience constructors for backwards compatibility
     public ExtractorConfig(TableTypeEnum tableType, TableMatchMethodEnum tableMatchMethod,
                            String[] conditions, int expectParseRowSize, String interpretConditions,
                            boolean isMergeRow, boolean isMergeSameTitle, boolean isRemoveEmptyRow,
                            boolean isSmartHandle, boolean isKvTableOptimization, boolean isOpenThMultipleRowMatch,
-                           int thMultipleRowNumber) {
+                           int thMultipleRowNumber, boolean isHandleUnit) {
         this(new Builder()
                 .setParseType(ParseTypeEnum.TABLE)
                 .setTableType(tableType)
@@ -156,6 +163,7 @@ public class ExtractorConfig {
                 .setExpectParseRowSize(expectParseRowSize)
                 .setInterpretConditions(interpretConditions)
                 .setIsMergeRow(isMergeRow)
+                .setIsHandleUnit(isHandleUnit)
                 .setIsMergeSameTitle(isMergeSameTitle)
                 .setIsRemoveEmptyRow(isRemoveEmptyRow)
                 .setIsSmartHandle(isSmartHandle)

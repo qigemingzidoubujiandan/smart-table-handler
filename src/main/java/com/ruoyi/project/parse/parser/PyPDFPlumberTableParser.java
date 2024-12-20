@@ -57,9 +57,6 @@ public class PyPDFPlumberTableParser extends AbstractTableParser<String> {
                 throw new RuntimeException("执行py脚本异常!" + errorMsg);
             }
             List<PDFTable> tableList = convertToPdfTable(pyPrint);
-
-            delEmptyTable(tableList);
-            AbstractTableParser.handleExt(tableList);
             return tableList;
         } catch (Exception e) {
             log.error("解析出现异常!path:{}", dataSource, e);

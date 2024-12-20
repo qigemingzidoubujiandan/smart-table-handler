@@ -60,11 +60,55 @@
             </div>
             <div class="col-xs-12">
                 <div class="form-group">
-                    <label class="col-sm-3 control-label">合并跨页引起的行分割：</label>
+                    <label class="col-sm-3 control-label">默认优化处理：</label>
                     <div class="col-sm-8">
                         <div class="radio-box" th:each="dict : ${@dict.getType('yes_or_no')}">
-                            <input type="radio" th:id="${'tableMatchMethod_' + dict.dictCode}" name="tableIsMergeRow" th:value="${dict.dictValue}" th:checked="${dict.default}">
-                            <label th:for="${'tableIsMergeRow_' + dict.dictCode}" th:text="${dict.dictLabel}"></label>
+                            <input type="radio" th:id="${'tableIsSmartHandle_' + dict.dictCode}" name="tableIsSmartHandle" th:value="${dict.dictValue}" th:checked="${dict.default}">
+                            <label th:for="${'tableIsSmartHandle__' + dict.dictCode}" th:text="${dict.dictLabel}"></label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">是否对键值对表格优化：</label>
+                    <div class="col-sm-8">
+                        <div class="radio-box" th:each="dict : ${@dict.getType('yes_or_no')}">
+                            <input type="radio" th:id="${'tableIsKvTableOptimization_' + dict.dictCode}" name="tableIsKvTableOptimization" th:value="${dict.dictValue}" th:checked="${dict.default}">
+                            <label th:for="${'tableIsKvTableOptimization_' + dict.dictCode}" th:text="${dict.dictLabel}"></label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">合并相同标题表格：</label>
+                    <div class="col-sm-8">
+                        <div class="radio-box" th:each="dict : ${@dict.getType('yes_or_no')}">
+                            <input type="radio" th:id="${'tableIsMergeSameTitle_' + dict.dictCode}" name="tableIsMergeSameTitle" th:value="${dict.dictValue}" th:checked="${dict.default}">
+                            <label th:for="${'tableIsMergeSameTitle_' + dict.dictCode}" th:text="${dict.dictLabel}"></label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">是否转换单位：<br>统一以元处理</label>
+                    <div class="col-sm-8">
+                        <div class="radio-box" th:each="dict : ${@dict.getType('yes_or_no')}">
+                            <input type="radio" th:id="${'tableIsHandleUnit_' + dict.dictCode}" name="tableIsHandleUnit" th:value="${dict.dictValue}" th:checked="${dict.default}">
+                            <label th:for="${'tableIsHandleUnit_' + dict.dictCode}" th:text="${dict.dictLabel}"></label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">是否删除空行：</label>
+                    <div class="col-sm-8">
+                        <div class="radio-box" th:each="dict : ${@dict.getType('yes_or_no')}">
+                            <input type="radio" th:id="${'tableIsDelEmptyRow_' + dict.dictCode}" name="tableIsDelEmptyRow" th:value="${dict.dictValue}" th:checked="${dict.default}">
+                            <label th:for="${'tableIsDelEmptyRow_' + dict.dictCode}" th:text="${dict.dictLabel}"></label>
                         </div>
                     </div>
                 </div>

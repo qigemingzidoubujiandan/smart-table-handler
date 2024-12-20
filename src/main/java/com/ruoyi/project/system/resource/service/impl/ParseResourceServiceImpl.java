@@ -106,7 +106,7 @@ public class ParseResourceServiceImpl implements IParseResourceService {
             resourceFile.setFileName(FileUtils.getName(file));
             resourceFile.setFileType(FileTypeUtils.getFileType(file));
             resourceFile.setLocation(file);
-            resourceFile.setIsParsed(0L);
+            resourceFile.setIsParsed(Constants.NO);
             list.add(resourceFile);
             parseResourceFileMapper.insertParseResourceFile(resourceFile);
         });
@@ -190,7 +190,7 @@ public class ParseResourceServiceImpl implements IParseResourceService {
         clearPrevResult(parseResource.getResourceId());
         // 进行解析
         parse(parseResource);
-        parseResource.setIsParsed(Long.parseLong(Constants.YES));
+        parseResource.setIsParsed(Constants.YES);
         parseResource.setUpdateTime(DateUtils.getNowDate());
         return parseResourceMapper.updateParseResource(parseResource);
     }
@@ -269,7 +269,7 @@ public class ParseResourceServiceImpl implements IParseResourceService {
                 parseResult(parseResourceFile, parseConfig, extractedResult);
             }
         }
-        parseResourceFile.setIsParsed(Long.parseLong(Constants.YES));
+        parseResourceFile.setIsParsed(Constants.YES);
         parseResourceFile.setUpdateTime(DateUtils.getNowDate());
         parseResourceFileMapper.updateParseResourceFile(parseResourceFile);
     }

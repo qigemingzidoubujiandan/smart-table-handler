@@ -5,12 +5,17 @@ import cn.hutool.core.collection.CollUtil;
 import com.ruoyi.project.parse.domain.Cell;
 import com.ruoyi.project.parse.domain.Table;
 import com.ruoyi.project.parse.extractor.result.KVExtractedResult;
+import com.ruoyi.project.parse.extractor.unit.UnitConvert;
 import com.ruoyi.project.parse.util.TableUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+
+import static com.ruoyi.project.parse.extractor.unit.UnitExtractConverter.handleAmountUnit;
+import static com.ruoyi.project.parse.extractor.unit.UnitExtractor.amountUnitExtract;
 
 /**
  * map格式的规则。
@@ -96,6 +101,26 @@ public class MapExtractor extends AbstractTableExtractor<KVExtractedResult> {
                 }
                 this.fillMatchedData(new KVExtractedResult(tempMap));
             }
+        }
+    }
+
+
+    /**
+     * kv表格单位转换
+     *
+     * @param map    map
+     * @param row    row kv表格的行
+     * @param rowKey kv表格的key
+     */
+    protected static void unitConvert(Map<String, String> map, List<Cell> row, String rowKey) {
+        String numbStr = TableUtil.format(row.get(1).text());
+        String unitStr = amountUnitExtract(rowKey);
+        UnitConvert.Unit byUnit = UnitConvert.Unit.getByUnit(unitStr);
+        if (Objects.isNull(byUnit)) {
+            map.put(rowKey, handleAmountUnit(numbStr));
+        } else {
+            String numbConvert = UnitConvert.getAmountConvertFactory().get(byUnit).apply(numbStr);
+            map.put(rowKey, numbConvert);
         }
     }
 

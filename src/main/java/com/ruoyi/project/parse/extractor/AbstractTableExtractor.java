@@ -1,14 +1,13 @@
 package com.ruoyi.project.parse.extractor;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.StrUtil;
 import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.project.parse.extractor.unit.UnitConvert;
 import com.ruoyi.project.parse.domain.Cell;
 import com.ruoyi.project.parse.domain.PDFTable;
 import com.ruoyi.project.parse.domain.Table;
 import com.ruoyi.project.parse.extractor.result.ExtractedResult;
-import com.ruoyi.project.parse.util.TableUtil;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.utils.Lists;
@@ -17,7 +16,6 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.ruoyi.project.parse.extractor.unit.UnitExtractConverter.handleAmountUnit;
 import static com.ruoyi.project.parse.extractor.unit.UnitExtractor.amountUnitExtract;
 
 
@@ -61,6 +59,11 @@ public abstract class AbstractTableExtractor<T extends ExtractedResult> implemen
     }
 
     private void performStandardPreprocess(List<Table> tables) {
+        // 删除空表格
+        delEmptyTable(tables);
+        if (config.isHandleUnit()) {
+            handleUnit(tables);
+        }
         if (config.isMergeRow()) {
             mergePDFRow(tables);
         }
@@ -86,50 +89,6 @@ public abstract class AbstractTableExtractor<T extends ExtractedResult> implemen
 
     public abstract void fillMatchedData(T t);
 
-    /**
-     * kv表格单位转换
-     *
-     * @param map    map
-     * @param row    row kv表格的行
-     * @param rowKey kv表格的key
-     */
-    protected static void unitConvert(Map<String, String> map, List<Cell> row, String rowKey) {
-        String numbStr = TableUtil.format(row.get(1).text());
-        String unitStr = amountUnitExtract(rowKey);
-        UnitConvert.Unit byUnit = UnitConvert.Unit.getByUnit(unitStr);
-        if (Objects.isNull(byUnit)) {
-            map.put(rowKey, handleAmountUnit(numbStr));
-        } else {
-            String numbConvert = UnitConvert.getAmountConvertFactory().get(byUnit).apply(numbStr);
-            map.put(rowKey, numbConvert);
-        }
-    }
-
-    /**
-     * 仿照kv表格单位转换
-     * 将转换出的结果返回 自行处理
-     */
-    private static String getUnitConvert(String cell, String rowKey) {
-        String numbStr = TableUtil.format(cell);
-        String unitStr = amountUnitExtract(rowKey);
-        UnitConvert.Unit byUnit = UnitConvert.Unit.getByUnit(unitStr);
-        if (Objects.isNull(byUnit)) {
-            return handleAmountUnit(numbStr);
-        } else {
-            return UnitConvert.getAmountConvertFactory().get(byUnit).apply(numbStr);
-        }
-    }
-
-
-    protected static void fillThFunction(List<Function<String, String>> thFunc, List<? extends Cell> thList) {
-        // 处理表头单位
-        if (CollUtil.isEmpty(thFunc)) {
-            thList.stream().map(thCell ->
-                            UnitConvert.Unit.getByUnit(String.valueOf(thCell.ext())))
-                    .map(unit -> UnitConvert.getAmountConvertFactory().get(unit))
-                    .forEach(thFunc::add);
-        }
-    }
 
     /**
      * 智能的处理表格样式
@@ -324,11 +283,6 @@ public abstract class AbstractTableExtractor<T extends ExtractedResult> implemen
         return emptyIndexList;
     }
 
-    public void mergePDFRow(String isMergeSameTitle, List<Table> tableList) {
-        if ("1".equals(isMergeSameTitle)) {
-            mergePDFRow(tableList);
-        }
-    }
 
     /**
      * 合并因分页切割的pdf类型表格
@@ -435,5 +389,41 @@ public abstract class AbstractTableExtractor<T extends ExtractedResult> implemen
         return newTable;
     }
 
+    /**
+     * 处理扩展信息
+     */
+    public static void handleUnit(List<? extends Table> tables) {
+        handleUnit(tables, null);
+    }
+
+    /**
+     * 处理单位
+     * 每个单元格都处理，不确定那个作为表头
+     */
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    public static void handleUnit(List<? extends Table> tables, List<Function<String, String>> func) {
+        if (tables == null || tables.isEmpty()) {
+            return;
+        }
+        tables.forEach(r -> {
+            List<List<Cell>> data = r.getData();
+            for (List<Cell> list : data) {
+                if (CollUtil.isNotEmpty(list)) {
+                    list.forEach(th -> {
+                        String ext =
+                                CollUtil.isEmpty(func) ? amountUnitExtract(th.text()) : amountUnitExtract(func, th.text());
+                        if (CharSequenceUtil.isNotEmpty(ext)) {
+                            th.setExt(ext);
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+
+    protected void delEmptyTable(List<? extends Table> tables) {
+        tables.removeIf(table -> table.getData().isEmpty());
+    }
 
 }

@@ -47,9 +47,9 @@ public class WordTableParser extends AbstractTableParser<String> {
      * 1 merge data
      * 2 null  data
      * 3 data  data
-     *
+     * <p>
      * ======================
-     *
+     * <p>
      * ②横向合并
      * 表格显示（合并代表合并单元格）：
      * ———————————————
@@ -64,7 +64,7 @@ public class WordTableParser extends AbstractTableParser<String> {
      * 2 data data
      * 3 data data
      * 【第一行为两列，其他行为三列】
-     *
+     * <p>
      * 总结：POI处理横向合并单元格不会冗余其他行的列数（和pdf解析不同），处理纵向合并单元格和PDF解析一致。
      * 不会发生额外空列情况，不需要处理表格跨页的情况。
      */
@@ -87,9 +87,6 @@ public class WordTableParser extends AbstractTableParser<String> {
             log.error("解析出现异常!path:{}", dataSource, e);
         }
 
-        //删除空表
-        delEmptyTable(wordTableList);
-        AbstractTableParser.handleExt(wordTableList);
         return wordTableList;
     }
 

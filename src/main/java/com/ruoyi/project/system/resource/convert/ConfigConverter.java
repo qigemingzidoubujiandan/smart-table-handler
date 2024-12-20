@@ -65,11 +65,14 @@ public class ConfigConverter {
                 .setConditions(Convert.toStrArray(parseConfig.getTableConditions()))
                 .setExpectParseRowSize(parseConfig.getTableExpectationRow())
                 .setInterpretConditions(parseConfig.getTableInterpretConditions())
+                .setThMultipleRowNumber(parseConfig.getThMultipleRowNumber())
+
                 .setIsMergeRow(Objects.equals(YES, parseConfig.getTableIsMergeRow()))
                 .setIsMergeSameTitle(Objects.equals(YES, parseConfig.getTableIsMergeSameTitle()))
                 .setIsRemoveEmptyRow(Objects.equals(YES, parseConfig.getTableIsDelEmptyRow()))
                 .setIsSmartHandle(Objects.equals(YES, parseConfig.getTableIsSmartHandle()))
                 .setIsKvTableOptimization(Objects.equals(YES, parseConfig.getTableIsKvTableOptimization()))
+                .setIsHandleUnit(Objects.equals(YES, parseConfig.getTableIsHandleUnit()))
                 .build();
     }
 

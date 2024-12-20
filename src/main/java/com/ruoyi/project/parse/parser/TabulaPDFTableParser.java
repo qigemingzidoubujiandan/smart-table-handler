@@ -63,10 +63,6 @@ public class TabulaPDFTableParser extends AbstractTableParser<String> {
         } catch (Exception e) {
             log.error("pdfTables Null error : {}", e.getMessage());
         }
-        //删除空表
-        delEmptyTable(pdfTables);
-        AbstractTableParser.handleExt(pdfTables);
-
         return pdfTables;
     }
 
