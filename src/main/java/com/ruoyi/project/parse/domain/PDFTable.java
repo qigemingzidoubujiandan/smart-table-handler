@@ -17,19 +17,6 @@ import java.util.stream.Collectors;
 public class PDFTable extends Table {
 
     @Override
-    public void setData(List<List<Cell>> data) {
-        List<List<Cell>> pdfData = new ArrayList<>();
-        data.forEach(th -> {
-            List<Cell> pdfTh = new ArrayList<>();
-            th.forEach(cell -> {
-                pdfTh.add(cell);
-            });
-            pdfData.add(pdfTh);
-        });
-        this.setData(pdfData);
-    }
-
-    @Override
     public FileTypeEnum source() {
         return FileTypeEnum.PDF;
     }

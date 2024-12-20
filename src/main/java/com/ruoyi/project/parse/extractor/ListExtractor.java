@@ -12,7 +12,6 @@ import com.ruoyi.project.parse.extractor.result.TableExtractedResult;
 import com.ruoyi.project.parse.extractor.unit.UnitConvert;
 import com.ruoyi.project.parse.util.CollectionUtil;
 import com.ruoyi.project.parse.util.TableUtil;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
@@ -55,10 +54,14 @@ public class ListExtractor extends AbstractTableExtractor<TableExtractedResult> 
 
     @Override
     protected void doExtract(List<Table> tables) {
-        if (TableMatchMethodEnum.EXACT.equals(config.getTableMatchMethod())) {
-            exactMatchingExtractTable(tables);
+        if (config.getTitleRowNumber() > 1) {
+            fuzzyMatchingExtractTableByMultipleTitle(tables);
         } else {
-            fuzzyMatchingExtractTable(tables);
+            if (TableMatchMethodEnum.EXACT.equals(config.getTableMatchMethod())) {
+                exactMatchingExtractTable(tables);
+            } else {
+                fuzzyMatchingExtractTable(tables);
+            }
         }
     }
 
@@ -397,6 +400,55 @@ public class ListExtractor extends AbstractTableExtractor<TableExtractedResult> 
     //-------------------------------------------------------------------多行标题处理-------------------------------------
 
     /**
+     * 抽取完整的表格的内容信息
+     * 如果是pdf抽取的，可能被分页割开，一直抽取到满足列数为止
+     */
+    protected void fuzzyMatchingExtractTableByMultipleTitle(List<Table> tables) {
+        outer:
+        for (int i = 0; i < tables.size(); i++) {
+            Table table = tables.get(i);
+            // 抽取过的就不必再抽取了，这里只考虑数据被一个地方用
+            if (table.isExtracted()) {
+                continue;
+            }
+            // 该规则已经解析完毕
+            if (parsed()) {
+                continue;
+            }
+            int result;
+            // 处理表头单位
+            List<Function<String, String>> thFunc = new ArrayList<>(8);
+//            if (fuzzyMatching) {
+//                result = fuzzyMatchingExtractTableCell(table, thFunc, true);
+//            } else {
+                result = fuzzyMatchingExtractTableByMultipleTitle(table, thFunc, true);
+//            }
+            if (result == ExtractRet.FINISH) {
+                table.setExtracted(true);
+                // 如果抽取得结果完成，结束不必要的循环
+                break;
+            }
+            if (result == ExtractRet.UNFINISHED) {
+                table.setExtracted(true);
+            }
+            // 如果表格类型是pdf,被分页切割了，需要继续进行抽取，重下一个、下下一个....表格进行抽取
+            while (Objects.equals(table.source(), FileTypeEnum.PDF) && i + 1 < tables.size()
+                    && result == ExtractRet.UNFINISHED) {
+                Table nextPDFTable = tables.get(++i);
+                result = fuzzyMatchingExtractTableByMultipleTitle(nextPDFTable, thFunc, true);
+                // 失败表示该表格未满足期望的条数，但是接下来的表格却因为 列不符合 等原因失败，说明该表格已经没有了后续，直接退出
+                if (result == ExtractRet.FAIL) {
+                    table.setExtracted(true);
+                    break outer;
+                }
+                if (result == ExtractRet.UNFINISHED) {
+                    nextPDFTable.setExtracted(true);
+                }
+            }
+        }
+
+    }
+    /**
      * 多行标题处理
      * <p>
      * ex：
@@ -421,7 +473,7 @@ public class ListExtractor extends AbstractTableExtractor<TableExtractedResult> 
         }
 
         // 获取多行标题
-        List<List<Cell>> multipleTitles = table.getData().subList(0, config.getThMultipleRowNumber());
+        List<List<Cell>> multipleTitles = table.getData().subList(0, config.getTitleRowNumber());
 
         // 去掉换行
         Object[] thArr = multipleTitles.stream().flatMap(Collection::stream).map(Cell::text).map(format()).toArray();

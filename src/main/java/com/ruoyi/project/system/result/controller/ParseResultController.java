@@ -2,6 +2,8 @@ package com.ruoyi.project.system.result.controller;
 
 import java.util.List;
 
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import com.ruoyi.project.system.file.domain.ParseResourceFile;
 import com.ruoyi.project.system.file.service.IParseResourceFileService;
 import com.ruoyi.project.system.resource.domain.ParseResource;
@@ -64,7 +66,18 @@ public class ParseResultController extends BaseController {
     @ResponseBody
     public String result(Long parseResultId) {
         ParseResult parseResult = parseResultService.selectParseResultByParseResultId(parseResultId);
-        return parseResult.getResult();
+        String result = parseResult.getResult();
+        JSONObject entries = JSONUtil.parseObj(result);
+        if (entries.containsKey("tableData")) {
+            return entries.get("tableData").toString();
+        }
+        if (entries.containsKey("keyValuePairs")) {
+            return result;
+        }
+        if (entries.containsKey("text")) {
+            return result;
+        }
+        return result;
     }
 
     /**

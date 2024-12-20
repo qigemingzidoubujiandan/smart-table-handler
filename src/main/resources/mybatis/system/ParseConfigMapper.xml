@@ -3,7 +3,7 @@
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.project.system.tableconfig.mapper.ParseConfigMapper">
-    
+
     <resultMap type="ParseConfig" id="ParseConfigResult">
         <result property="parseConfigId"    column="parse_config_id"    />
         <result property="resourceId"    column="resource_id"    />
@@ -14,8 +14,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="tableParserType"    column="table_parser_type"    />
         <result property="tableConditions"    column="table_conditions"    />
         <result property="tableExpectationRow"    column="table_expectation_row"    />
+        <result property="tableTitleRowNumber"    column="table_title_row_number"    />
         <result property="tableIsMergeSameTitle"    column="table_is_merge_same_title"    />
+        <result property="tableIsSmartHandle"    column="table_is_smart_handle"    />
+        <result property="tableIsKvTableOptimization"    column="table_is_kv_table_optimization"    />
         <result property="tableIsMergeRow"    column="table_is_merge_row"    />
+        <result property="tableIsHandleUnit"    column="table_is_handle_unit"    />
+        <result property="tableIsDelEmptyRow"    column="table_is_del_empty_row"    />
         <result property="tableInterpretConditions"    column="table_interpret_conditions"    />
         <result property="textRegExpression"    column="text_reg_expression"    />
         <result property="createBy"    column="create_by"    />
@@ -26,7 +31,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectParseConfigVo">
-        select parse_config_id, resource_id, parse_desc, config_type, table_type, table_match_method, table_parser_type, table_conditions, table_expectation_row, table_is_merge_same_title, table_is_merge_row, table_interpret_conditions, text_reg_expression, create_by, create_time, update_by, update_time, remark from parse_config
+        select parse_config_id, resource_id, parse_desc, config_type, table_type, table_match_method, table_parser_type, table_conditions, table_expectation_row, table_title_row_number, table_is_merge_same_title, table_is_smart_handle, table_is_kv_table_optimization, table_is_merge_row, table_is_handle_unit, table_is_del_empty_row, table_interpret_conditions, text_reg_expression, create_by, create_time, update_by, update_time, remark from parse_config
     </sql>
 
     <select id="selectList" parameterType="ParseConfig" resultMap="ParseConfigResult">
@@ -48,11 +53,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="tableType"    column="table_type"    />
         <result property="tableMatchMethod"    column="table_match_method"    />
         <result property="tableParserType"    column="table_parser_type"    />
-        <result property="tableConditions"    column="table_conditions"    />
         <result property="tableExpectationRow"    column="table_expectation_row"    />
         <result property="tableIsMergeSameTitle"    column="table_is_merge_same_title"    />
         <result property="tableIsMergeRow"    column="table_is_merge_row"    />
-        <result property="tableInterpretConditions"    column="table_interpret_conditions"    />
+        <result property="tableTitleRowNumber"    column="table_title_row_number"    />
+        <result property="tableIsSmartHandle"    column="table_is_smart_handle"    />
+        <result property="tableIsKvTableOptimization"    column="table_is_kv_table_optimization"    />
+        <result property="tableIsHandleUnit"    column="table_is_handle_unit"    />
+        <result property="tableIsDelEmptyRow"    column="table_is_del_empty_row"    />
         <result property="textRegExpression"    column="text_reg_expression"    />
         <result property="createBy"    column="create_by"    />
         <result property="createTime"    column="create_time"    />
@@ -69,6 +77,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         pc.parse_desc,
         pc.config_type,
         pc.table_type,
+        pc.table_title_row_number,
+        pc.table_is_smart_handle,
+        pc.table_is_kv_table_optimization,
+        pc.table_is_handle_unit,
+        pc.table_is_del_empty_row,
         pc.table_match_method,
         pc.table_parser_type,
         pc.table_conditions,
@@ -114,10 +127,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="tableType != null">table_type,</if>
             <if test="tableMatchMethod != null">table_match_method,</if>
             <if test="tableParserType != null">table_parser_type,</if>
-            <if test="tableConditions != null and tableConditions != ''">table_conditions,</if>
+            <if test="tableConditions != null">table_conditions,</if>
             <if test="tableExpectationRow != null">table_expectation_row,</if>
+            <if test="tableTitleRowNumber != null">table_title_row_number,</if>
             <if test="tableIsMergeSameTitle != null">table_is_merge_same_title,</if>
+            <if test="tableIsSmartHandle != null">table_is_smart_handle,</if>
+            <if test="tableIsKvTableOptimization != null">table_is_kv_table_optimization,</if>
             <if test="tableIsMergeRow != null">table_is_merge_row,</if>
+            <if test="tableIsHandleUnit != null">table_is_handle_unit,</if>
+            <if test="tableIsDelEmptyRow != null">table_is_del_empty_row,</if>
             <if test="tableInterpretConditions != null">table_interpret_conditions,</if>
             <if test="textRegExpression != null">text_reg_expression,</if>
             <if test="createBy != null">create_by,</if>
@@ -125,7 +143,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="updateBy != null">update_by,</if>
             <if test="updateTime != null">update_time,</if>
             <if test="remark != null">remark,</if>
-         </trim>
+        </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="resourceId != null">#{resourceId},</if>
             <if test="parseDesc != null and parseDesc != ''">#{parseDesc},</if>
@@ -133,10 +151,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="tableType != null">#{tableType},</if>
             <if test="tableMatchMethod != null">#{tableMatchMethod},</if>
             <if test="tableParserType != null">#{tableParserType},</if>
-            <if test="tableConditions != null and tableConditions != ''">#{tableConditions},</if>
+            <if test="tableConditions != null">#{tableConditions},</if>
             <if test="tableExpectationRow != null">#{tableExpectationRow},</if>
+            <if test="tableTitleRowNumber != null">#{tableTitleRowNumber},</if>
             <if test="tableIsMergeSameTitle != null">#{tableIsMergeSameTitle},</if>
+            <if test="tableIsSmartHandle != null">#{tableIsSmartHandle},</if>
+            <if test="tableIsKvTableOptimization != null">#{tableIsKvTableOptimization},</if>
             <if test="tableIsMergeRow != null">#{tableIsMergeRow},</if>
+            <if test="tableIsHandleUnit != null">#{tableIsHandleUnit},</if>
+            <if test="tableIsDelEmptyRow != null">#{tableIsDelEmptyRow},</if>
             <if test="tableInterpretConditions != null">#{tableInterpretConditions},</if>
             <if test="textRegExpression != null">#{textRegExpression},</if>
             <if test="createBy != null">#{createBy},</if>
@@ -144,7 +167,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="updateBy != null">#{updateBy},</if>
             <if test="updateTime != null">#{updateTime},</if>
             <if test="remark != null">#{remark},</if>
-         </trim>
+        </trim>
     </insert>
 
     <update id="updateParseConfig" parameterType="ParseConfig">
@@ -156,10 +179,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="tableType != null">table_type = #{tableType},</if>
             <if test="tableMatchMethod != null">table_match_method = #{tableMatchMethod},</if>
             <if test="tableParserType != null">table_parser_type = #{tableParserType},</if>
-            <if test="tableConditions != null and tableConditions != ''">table_conditions = #{tableConditions},</if>
+            <if test="tableConditions != null">table_conditions = #{tableConditions},</if>
             <if test="tableExpectationRow != null">table_expectation_row = #{tableExpectationRow},</if>
+            <if test="tableTitleRowNumber != null">table_title_row_number = #{tableTitleRowNumber},</if>
             <if test="tableIsMergeSameTitle != null">table_is_merge_same_title = #{tableIsMergeSameTitle},</if>
+            <if test="tableIsSmartHandle != null">table_is_smart_handle = #{tableIsSmartHandle},</if>
+            <if test="tableIsKvTableOptimization != null">table_is_kv_table_optimization = #{tableIsKvTableOptimization},</if>
             <if test="tableIsMergeRow != null">table_is_merge_row = #{tableIsMergeRow},</if>
+            <if test="tableIsHandleUnit != null">table_is_handle_unit = #{tableIsHandleUnit},</if>
+            <if test="tableIsDelEmptyRow != null">table_is_del_empty_row = #{tableIsDelEmptyRow},</if>
             <if test="tableInterpretConditions != null">table_interpret_conditions = #{tableInterpretConditions},</if>
             <if test="textRegExpression != null">text_reg_expression = #{textRegExpression},</if>
             <if test="createBy != null">create_by = #{createBy},</if>
@@ -176,7 +204,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </delete>
 
     <delete id="deleteParseConfigByParseConfigIds" parameterType="String">
-        delete from parse_config where parse_config_id in 
+        delete from parse_config where parse_config_id in
         <foreach item="parseConfigId" collection="array" open="(" separator="," close=")">
             #{parseConfigId}
         </foreach>

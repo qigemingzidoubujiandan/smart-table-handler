@@ -65,7 +65,7 @@ public class ConfigConverter {
                 .setConditions(Convert.toStrArray(parseConfig.getTableConditions()))
                 .setExpectParseRowSize(parseConfig.getTableExpectationRow())
                 .setInterpretConditions(parseConfig.getTableInterpretConditions())
-                .setThMultipleRowNumber(parseConfig.getThMultipleRowNumber())
+                .setTitleRowNumber(parseConfig.getTableTitleRowNumber() == null? 1 : parseConfig.getTableTitleRowNumber())
 
                 .setIsMergeRow(Objects.equals(YES, parseConfig.getTableIsMergeRow()))
                 .setIsMergeSameTitle(Objects.equals(YES, parseConfig.getTableIsMergeSameTitle()))

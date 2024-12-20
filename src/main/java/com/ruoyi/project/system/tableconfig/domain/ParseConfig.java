@@ -70,7 +70,7 @@ public class ParseConfig extends BaseEntity {
     /**
      * 多行表头的行数
      */
-    private Integer tableThMultipleRowNumber;
+    private Integer tableTitleRowNumber;
 
     /**
      * 合并相同标题表格

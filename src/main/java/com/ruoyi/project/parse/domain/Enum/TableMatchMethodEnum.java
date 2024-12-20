@@ -5,8 +5,8 @@ package com.ruoyi.project.parse.domain.Enum;
  */
 
 public enum TableMatchMethodEnum {
-    EXACT(1, "精确"),
-    FUZZY(2, "模糊");
+    EXACT(0, "精确"),
+    FUZZY(1, "模糊");
 
     private final Integer code;
     private final String desc;

@@ -177,8 +177,7 @@
                          // 清空之前的显示内容
                          $('#detailsTable').hide().find('thead, tbody').empty();
                          $('#modalContent').hide().text('');
-
-                         if (isJsonArray) {
+                         if (isJsonArray && content.length > 0) {
                              // 动态生成表格列
                              var $thead = $('<tr></tr>');
                              content[0].forEach(function(header) {

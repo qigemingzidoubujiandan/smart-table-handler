@@ -58,24 +58,8 @@
         var prefix = ctx + "system/resource";
 
         function parse(id) {
-            $.ajax({
-                cache : true,
-                type : "POST",
-                url : prefix + "/parse/"+id,
-                data : {
-                },
-                async : false,
-                beforeSend: function () {
-                    $.modal.loading("正在处理中，请稍候...");
-                    $.modal.disable();
-                },
-                error : function(request) {
-                    $.modal.alertError("系统错误");
-                },
-                success: function(result) {
-                    $.operate.successCallback(result);
-                }
-            });
+            $.operate.submit(prefix +"/parse/"+id, "post", "json", null);
+
         }
         $(function() {
             var options = {

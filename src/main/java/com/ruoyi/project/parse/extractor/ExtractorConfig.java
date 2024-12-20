@@ -22,7 +22,7 @@ public class ExtractorConfig {
     private final String interpretConditions;
 
     private final boolean isOpenThMultipleRowMatch;
-    private final int thMultipleRowNumber;
+    private final int titleRowNumber;
     private final boolean isMergeRow;
     private final boolean isMergeSameTitle;
     private final boolean isRemoveEmptyRow;
@@ -46,7 +46,7 @@ public class ExtractorConfig {
         this.isKvTableOptimization = builder.isKvTableOptimization;
         this.textPattern = builder.textPattern;
         this.isOpenThMultipleRowMatch = builder.isOpenThMultipleRowMatch;
-        this.thMultipleRowNumber = builder.thMultipleRowNumber;
+        this.titleRowNumber = builder.titleRowNumber;
         this.isHandleUnit = builder.isHandleUnit;
     }
 
@@ -63,7 +63,7 @@ public class ExtractorConfig {
         private boolean isMergeRow;
         private boolean isMergeSameTitle;
         private boolean isOpenThMultipleRowMatch = false;
-        private int thMultipleRowNumber = 2;
+        private int titleRowNumber = 1;
         private boolean isRemoveEmptyRow = true;
         private boolean isSmartHandle = false;
         private boolean isKvTableOptimization = true;
@@ -115,8 +115,8 @@ public class ExtractorConfig {
             return this;
         }
 
-        public Builder setThMultipleRowNumber(int thMultipleRowNumber) {
-            this.thMultipleRowNumber = thMultipleRowNumber;
+        public Builder setTitleRowNumber(int titleRowNumber) {
+            this.titleRowNumber = titleRowNumber;
             return this;
         }
 
@@ -154,7 +154,7 @@ public class ExtractorConfig {
                            String[] conditions, int expectParseRowSize, String interpretConditions,
                            boolean isMergeRow, boolean isMergeSameTitle, boolean isRemoveEmptyRow,
                            boolean isSmartHandle, boolean isKvTableOptimization, boolean isOpenThMultipleRowMatch,
-                           int thMultipleRowNumber, boolean isHandleUnit) {
+                           int titleRowNumber, boolean isHandleUnit) {
         this(new Builder()
                 .setParseType(ParseTypeEnum.TABLE)
                 .setTableType(tableType)
@@ -168,7 +168,7 @@ public class ExtractorConfig {
                 .setIsRemoveEmptyRow(isRemoveEmptyRow)
                 .setIsSmartHandle(isSmartHandle)
                 .setIsOpenThMultipleRowMatch(isOpenThMultipleRowMatch)
-                .setThMultipleRowNumber(thMultipleRowNumber)
+                .setTitleRowNumber(titleRowNumber)
                 .setIsKvTableOptimization(isKvTableOptimization));
     }
 
