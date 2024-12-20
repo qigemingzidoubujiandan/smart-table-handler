@@ -2,7 +2,10 @@ package com.ruoyi.project.parse.extractor;
 
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.text.CharSequenceUtil;
+import cn.hutool.core.util.StrUtil;
 import com.ruoyi.project.parse.domain.Cell;
+import com.ruoyi.project.parse.domain.Enum.TableMatchMethodEnum;
 import com.ruoyi.project.parse.domain.Table;
 import com.ruoyi.project.parse.extractor.result.KVExtractedResult;
 import com.ruoyi.project.parse.extractor.unit.UnitConvert;
@@ -92,7 +95,13 @@ public class MapExtractor extends AbstractTableExtractor<KVExtractedResult> {
         String[] conditions = config.getConditions();
         for (String condition : conditions) {
             String rowKey = TableUtil.format(cell.text());
-            if (rowKey.contains(condition)) {
+            boolean match;
+            if (TableMatchMethodEnum.EXACT.equals(config.getTableMatchMethod())) {
+                match = CharSequenceUtil.equals(rowKey, condition);
+            } else {
+                match = CharSequenceUtil.contains(rowKey, condition);
+            }
+            if (match) {
                 tempMap.clear();
                 try {
                     unitConvert(tempMap, row, rowKey);

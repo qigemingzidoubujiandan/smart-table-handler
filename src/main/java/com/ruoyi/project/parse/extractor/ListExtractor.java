@@ -55,7 +55,7 @@ public class ListExtractor extends AbstractTableExtractor<TableExtractedResult> 
     @Override
     protected void doExtract(List<Table> tables) {
         if (config.getTitleRowNumber() > 1) {
-            fuzzyMatchingExtractTableByMultipleTitle(tables);
+            matchingExtractTableByMultipleTitle(tables, !TableMatchMethodEnum.EXACT.equals(config.getTableMatchMethod()));
         } else {
             if (TableMatchMethodEnum.EXACT.equals(config.getTableMatchMethod())) {
                 exactMatchingExtractTable(tables);
@@ -403,7 +403,7 @@ public class ListExtractor extends AbstractTableExtractor<TableExtractedResult> 
      * 抽取完整的表格的内容信息
      * 如果是pdf抽取的，可能被分页割开，一直抽取到满足列数为止
      */
-    protected void fuzzyMatchingExtractTableByMultipleTitle(List<Table> tables) {
+    protected void matchingExtractTableByMultipleTitle(List<Table> tables, boolean fuzzyMatching) {
         outer:
         for (int i = 0; i < tables.size(); i++) {
             Table table = tables.get(i);
@@ -418,11 +418,7 @@ public class ListExtractor extends AbstractTableExtractor<TableExtractedResult> 
             int result;
             // 处理表头单位
             List<Function<String, String>> thFunc = new ArrayList<>(8);
-//            if (fuzzyMatching) {
-//                result = fuzzyMatchingExtractTableCell(table, thFunc, true);
-//            } else {
-                result = fuzzyMatchingExtractTableByMultipleTitle(table, thFunc, true);
-//            }
+            result = fuzzyMatchingExtractTableByMultipleTitle(table, thFunc, true, fuzzyMatching);
             if (result == ExtractRet.FINISH) {
                 table.setExtracted(true);
                 // 如果抽取得结果完成，结束不必要的循环
@@ -435,7 +431,7 @@ public class ListExtractor extends AbstractTableExtractor<TableExtractedResult> 
             while (Objects.equals(table.source(), FileTypeEnum.PDF) && i + 1 < tables.size()
                     && result == ExtractRet.UNFINISHED) {
                 Table nextPDFTable = tables.get(++i);
-                result = fuzzyMatchingExtractTableByMultipleTitle(nextPDFTable, thFunc, true);
+                result = fuzzyMatchingExtractTableByMultipleTitle(nextPDFTable, thFunc, false, fuzzyMatching);
                 // 失败表示该表格未满足期望的条数，但是接下来的表格却因为 列不符合 等原因失败，说明该表格已经没有了后续，直接退出
                 if (result == ExtractRet.FAIL) {
                     table.setExtracted(true);
@@ -448,12 +444,13 @@ public class ListExtractor extends AbstractTableExtractor<TableExtractedResult> 
         }
 
     }
+
     /**
      * 多行标题处理
      * <p>
      * ex：
      * 产品类型             本期                   上期
-     *              数量（只） 金额（万元）    数量（只）金额（万元）
+     * 数量（只） 金额（万元）    数量（只）金额（万元）
      * 匹配条件传：["产品类型","本期", "上期", "数量", "金额", "数量", "金额"];
      * </p>
      *
@@ -463,7 +460,7 @@ public class ListExtractor extends AbstractTableExtractor<TableExtractedResult> 
      * @return
      */
     private int fuzzyMatchingExtractTableByMultipleTitle(Table table, List<Function<String, String>> thFunc,
-                                                         boolean isVerifyTableTitle) {
+                                                         boolean isVerifyTableTitle, boolean fuzzyMatching) {
         if (this.parsed()) {
             return ExtractRet.FINISH;
         }
@@ -495,16 +492,19 @@ public class ListExtractor extends AbstractTableExtractor<TableExtractedResult> 
         // 验证表头 -> 多页的表格第一次才验证
         if (isVerifyTableTitle) {
             Object[] titles = Arrays.stream(config.getConditions()).map(String::trim).toArray();
-            if (!matchMultipleTitle(thArr, titles)) {
+            if (!matchMultipleTitle(thArr, titles, fuzzyMatching)) {
                 return ExtractRet.FAIL;
             }
         }
+
         // 填充处理表头函数
         unitHandle(multipleTitles, thFunc);
+
         // 是否强制结束匹配 可能有的表格行数不固定，但是被切割后又无法确定下一个是不是上一个表格得延续，需要自定义处理
         if (forceFinish(rows, isVerifyTableTitle)) {
             return ExtractRet.FINISH;
         }
+
         List<List<String>> list = new ArrayList<>(10);
         for (int i = 0; i < thFunc.size(); i++) {
             Function<String, String> function = thFunc.get(i);
@@ -596,11 +596,8 @@ public class ListExtractor extends AbstractTableExtractor<TableExtractedResult> 
      * @param conditions 条件数组
      * @return 如果 conditions 中的每个元素都在 titles 中存在模糊匹配且只匹配一次，则返回 true；否则返回 false。
      */
-    public boolean matchMultipleTitle(Object[] titles, Object[] conditions) {
-        if (conditions == null || conditions.length == 0) {
-            return false;
-        }
-        if (titles == null || titles.length == 0) {
+    public boolean matchMultipleTitle(Object[] titles, Object[] conditions, boolean fuzzyMatching) {
+        if (conditions == null || conditions.length == 0 || titles == null || titles.length == 0) {
             return false;
         }
 
@@ -622,10 +619,18 @@ public class ListExtractor extends AbstractTableExtractor<TableExtractedResult> 
 
             while (iterator.hasNext()) {
                 String title = iterator.next().trim().toLowerCase();
-                if (title.contains(conditionStr)) {
-                    iterator.remove(); // 成功匹配后移除该标题
-                    matched = true;
-                    break;
+                if (fuzzyMatching) {
+                    if (title.contains(conditionStr)) {
+                        iterator.remove(); // 成功匹配后移除该标题
+                        matched = true;
+                        break;
+                    }
+                } else {
+                    if (title.equals(conditionStr)) {
+                        iterator.remove();
+                        matched = true;
+                        break;
+                    }
                 }
             }
 
@@ -635,8 +640,8 @@ public class ListExtractor extends AbstractTableExtractor<TableExtractedResult> 
             }
         }
 
-        // 所有条件都成功匹配
-        return true;
+        // 所有条件都成功匹配 ,titles 被对消为空
+        return titleList.isEmpty();
     }
 
     //-------------------------------------------------------------------多行标题处理-------------------------------------
